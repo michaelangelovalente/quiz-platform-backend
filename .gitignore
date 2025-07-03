@@ -1,0 +1,432 @@
+
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+.idea/
+.idea_modules/
+# IntelliJ specific files to keep (uncomment if needed)
+# !.idea/codeStyles/
+# !.idea/inspectionProfiles/
+# !.idea/runConfigurations/
+# User-specific IntelliJ files
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries
+.idea/shelf/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+.metadata
+.settings/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.recommenders/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+*.code-workspace
+
+### Mac OS ###
+.DS_Store
+
+
+### Java & JVM ###
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# JVM Crash Logs
+*.hprof
+*.dump
+
+### Gradle ###
+
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+.gradle/
+.gradle
+gradlew
+gradlew.bat
+gradle/wrapper/gradle-wrapper.properties
+**/build/
+
+# ===============================================
+# Eclipse
+# ===============================================
+
+# ===============================================
+# Spring Boot
+# ===============================================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Spring Boot application properties with secrets
+application-local.yml
+application-local.yaml
+application-local.properties
+application-secrets.yml
+application-secrets.yaml
+application-secrets.properties
+
+# ===============================================
+# Database
+# ===============================================
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
+*.mv.db
+*.trace.db
+
+# PostgreSQL
+*.sql.backup
+
+# Database data directories
+/data/
+/db-data/
+/postgres-data/
+/redis-data/
+
+# ===============================================
+# Docker
+# ===============================================
+# Docker build context
+.dockerignore
+
+# Docker volumes
+docker-data/
+docker-logs/
+
+# Docker Compose override files
+docker-compose.override.yml
+docker-compose.override.yaml
+docker-compose.local.yml
+docker-compose.local.yaml
+
+# ===============================================
+# Kubernetes
+# ===============================================
+# Kubernetes secrets and configs
+k8s-secrets/
+*.kubeconfig
+*.kube
+
+# Helm
+helm-charts/*/charts/
+helm-charts/*/Chart.lock
+
+# ===============================================
+# Terraform
+# ===============================================
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+.terraform/
+.terraform.lock.hcl
+
+# ===============================================
+# Security & Credentials
+# ===============================================
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.envrc
+
+# Credential files
+credentials.json
+service-account.json
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.keystore
+*.truststore
+
+# AWS credentials
+.aws/credentials
+
+# Google Cloud credentials
+gcloud-service-key.json
+
+# ===============================================
+# Logs
+# ===============================================
+logs/
+*.log
+*.log.*
+log/
+spring.log
+application.log
+
+# Logback files
+logback-test.xml
+logback-spring.xml
+
+# ===============================================
+# Testing
+# ===============================================
+# Test reports
+test-output/
+test-results/
+reports/
+coverage/
+
+# JUnit
+junit.xml
+TEST-*.xml
+
+# ===============================================
+# Build Tools & Dependencies
+# ===============================================
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# SBT
+.cache
+.history
+.lib/
+dist/*
+target/
+
+# NPM (if using Node.js for frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ===============================================
+# Operating System
+# ===============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===============================================
+# Temporary Files
+# ===============================================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.swp
+*.swo
+*~
+
+# ===============================================
+# Development Tools
+# ===============================================
+# JProfiler
+*.jpx
+
+# JMeter
+*.jmx.backup
+
+# SonarQube
+.sonar/
+.scannerwork/
+
+# Checkstyle
+checkstyle-result.xml
+
+# SpotBugs
+spotbugs.xml
+
+# PMD
+pmd.xml
+
+# ===============================================
+# Monitoring & Observability
+# ===============================================
+# Micrometer/Prometheus metrics
+metrics/
+prometheus-data/
+
+# Grafana
+grafana-data/
+
+# Jaeger traces
+jaeger-data/
+
+# ===============================================
+# Application Specific
+# ===============================================
+# Uploaded files
+uploads/
+files/
+attachments/
+
+# Cache directories
+cache/
+.cache/
+
+# Application data
+app-data/
+application-data/
+
+# ===============================================
+# Documentation
+# ===============================================
+# Generated documentation
+docs/generated/
+javadoc/
+api-docs/
+
+# ===============================================
+# Performance & Profiling
+# ===============================================
+# JProfiler
+*.jpx
+
+# YourKit
+*.snapshot
+
+# JVM profiling
+*.hprof
+
+# ===============================================
+# Miscellaneous
+# ===============================================
+# Package Files
+*.tar.gz
+*.tgz
+*.zip
+*.rar
+
+# Patch files
+*.patch
+*.diff
+
+# Editor backups
+*~
+*.orig
+*.rej
+
+# Network files
+.nfs*
+
+# ===============================================
+# Project Specific Excludes
+# ===============================================
+# Quiz platform specific temporary files
+quiz-exports/
+session-exports/
+result-exports/
+
+# Test data
+test-data/
+sample-data/
+
+# Local configuration overrides
+local-config/
+local/
+
+# Development scripts
+dev-scripts/
+local-scripts/
+
+# ===============================================
+# KEEP - Important files to track
+# ===============================================
+# Always track these important files
+!gradle/wrapper/gradle-wrapper.jar
+!.mvn/wrapper/maven-wrapper.jar
+!.github/
+!docker/
+!k8s/
+!helm/
+!terraform/
+
+# Configuration templates (without secrets)
+!config-templates/
+!application-template.yml
