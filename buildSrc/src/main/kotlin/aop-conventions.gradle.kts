@@ -1,0 +1,21 @@
+plugins {
+    id("java-service-conventions")
+}
+
+dependencies {
+    // AOP dependencies
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("org.aspectj:aspectjweaver:1.9.20.1")
+
+    // Metrics and monitoring
+//    implementation("io.micrometer:micrometer-registry-prometheus")
+//    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+}
+
+// AOP-specific configuration
+tasks.withType<JavaCompile> {
+    options.compilerArgs.addAll(listOf(
+        "-Xlint:deprecation",
+        "-Xlint:unchecked"
+    ))
+}
