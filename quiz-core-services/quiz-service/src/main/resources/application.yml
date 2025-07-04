@@ -1,0 +1,35 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: quiz-service
+  
+  profiles:
+    active: dev
+    
+  main:
+    banner-mode: console
+    
+# Development profile
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+      
+logging:
+  level:
+    com.quizplatform: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

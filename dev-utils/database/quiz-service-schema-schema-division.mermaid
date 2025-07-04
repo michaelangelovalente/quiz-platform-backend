@@ -1,0 +1,87 @@
+graph TD
+    %% --- Styling for Schema Clarity ---
+    classDef content fill:#e6f2ff,stroke:#333,stroke-width:2px
+    classDef session fill:#e6ffe6,stroke:#333,stroke-width:2px
+    classDef results fill:#fff2e6,stroke:#333,stroke-width:2px
+
+    %% --- Schema: quiz_content (Owned by Quiz Service) ---
+    subgraph "Schema: quiz_content (Detailed)"
+        direction LR
+        quizzes["
+            <b>quizzes</b>
+            <hr>
+            UUID id (PK)
+            varchar title
+            text description
+            difficulty_level difficulty
+            quiz_status status
+            UUID created_by_id
+            timestamptz created_at
+            timestamptz updated_at
+        "]
+        questions["
+            <b>questions</b>
+            <hr>
+            UUID id (PK)
+            UUID quiz_id (FK)
+            text question_text
+            question_type type
+            smallint display_order
+        "]
+        answer_options["
+            <b>answer_options</b>
+            <hr>
+            UUID id (PK)
+            UUID question_id (FK)
+            text option_text
+            boolean is_correct
+        "]
+        coding_details["
+            <b>coding_question_details</b>
+            <hr>
+            UUID question_id (PK, FK)
+            varchar language
+            text code_template
+            jsonb test_cases
+        "]
+    end
+
+    %% --- Schema: quiz_session (Owned by Session Service) ---
+    subgraph "Schema: quiz_session (Minimal)"
+        sessions["
+            <b>sessions</b>
+            <hr>
+            UUID id (PK)
+            UUID quiz_id (FK)
+            UUID user_id
+            session_status status
+        "]
+    end
+
+    %% --- Schema: quiz_results (Owned by Results Service) ---
+    subgraph "Schema: quiz_results (Minimal)"
+        session_answers["
+            <b>session_answers</b>
+            <hr>
+            UUID id (PK)
+            UUID session_id (FK)
+            UUID question_id (FK)
+            UUID chosen_option_id (FK)
+        "]
+    end
+
+    %% --- Relationships ---
+    quizzes -- "1..N" --> questions
+    questions -- "1..N" --> answer_options
+    questions -- "1..1" --> coding_details
+
+    %% --- Cross-Schema Relationships ---
+    quizzes -.-> sessions
+    sessions -.-> session_answers
+    questions -.-> session_answers
+    answer_options -.-> session_answers
+
+    %% --- Apply Styles ---
+    class quizzes,questions,answer_options,coding_details content
+    class sessions session
+    class session_answers results

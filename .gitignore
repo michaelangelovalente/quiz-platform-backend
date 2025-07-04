@@ -322,6 +322,8 @@ TODO.md
 todo.md
 .todo/
 .claude/
+Gemini.md
+dev-utils/
 
 ### Package Files ###
 *.tar.gz

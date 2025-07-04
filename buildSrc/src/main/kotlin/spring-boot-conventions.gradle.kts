@@ -14,8 +14,8 @@ dependencies {
     // Actuator for health checks and metrics
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    // Development tools
-     developmentOnly("org.springframework.boot:spring-boot-starter-devtools")
+    // Development tools (disabled for MVP to avoid dependency issues)
+    // developmentOnly("org.springframework.boot:spring-boot-starter-devtools")
 
     // Configuration processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
