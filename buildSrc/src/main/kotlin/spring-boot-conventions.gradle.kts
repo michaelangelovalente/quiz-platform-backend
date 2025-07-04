@@ -2,12 +2,20 @@ plugins {
     id("java-service-conventions")
 }
 
-springBoot {
-    buildInfo()
+dependencies {
+    // Actuator for health checks and metrics
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    // Prometheus metrics
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
+    // Development tools
+    developmentOnly("org.springframework.boot:spring-boot-starter-devtools")
+
+    // Configuration processor
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-//    implementation("io.micrometer:micrometer-registry-prometheus")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
+springBoot {
+    buildInfo()
 }

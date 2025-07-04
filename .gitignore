@@ -278,9 +278,7 @@ checkstyle-result.xml
 spotbugs.xml
 pmd.xml
 
-# ===============================================
-# Monitoring and Observability
-# ===============================================
+### Monitoring and Observability ###
 metrics/
 prometheus-data/
 grafana-data/
@@ -311,23 +309,27 @@ app-data/
 application-data/
 
 # ===============================================
-# Documentation
+# OTHER
 # ===============================================
+### Documentation ##
 docs/generated/
 javadoc/
 api-docs/
 
-# ===============================================
-# Package Files
-# ===============================================
+### Development Assistant Files ###
+CLAUDE.md
+TODO.md
+todo.md
+.todo/
+.claude/
+
+### Package Files ###
 *.tar.gz
 *.tgz
 *.zip
 *.rar
 
-# ===============================================
-# Important Files to Keep
-# ===============================================
+### Important Files to Keep ###
 !gradle/wrapper/gradle-wrapper.jar
 !.mvn/wrapper/maven-wrapper.jar
 !.github/

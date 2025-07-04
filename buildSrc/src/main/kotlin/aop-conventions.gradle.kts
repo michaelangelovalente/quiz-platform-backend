@@ -2,15 +2,18 @@ plugins {
     id("java-service-conventions")
 }
 
+
 dependencies {
     // AOP dependencies
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.aspectj:aspectjweaver:1.9.20.1")
 
-    // Metrics and monitoring
-//    implementation("io.micrometer:micrometer-registry-prometheus")
-//    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    // Metrics and monitoring for AOP aspects --> TODO: add later on
+    //implementation("io.micrometer:micrometer-registry-prometheus")
+    //implementation("io.micrometer:micrometer-tracing-bridge-otel")
 }
+
+
 
 // AOP-specific configuration
 tasks.withType<JavaCompile> {
@@ -18,4 +21,13 @@ tasks.withType<JavaCompile> {
         "-Xlint:deprecation",
         "-Xlint:unchecked"
     ))
+}
+
+// AspectJ weaving configuration
+configurations.all {
+    resolutionStrategy {
+        // Ensure consistent AspectJ version
+        force("org.aspectj:aspectjweaver:1.9.20.1")
+        force("org.aspectj:aspectjrt:1.9.20.1")
+    }
 }

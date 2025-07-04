@@ -7,6 +7,10 @@ plugins {
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+
+    // Enable preview features for Java 21
+    withSourcesJar()
+    withJavadocJar()
 }
 
 configurations {
@@ -44,4 +48,16 @@ tasks.withType<Test> {
 
 tasks.named<Jar>("jar") {
     enabled = false
+}
+
+// Spring Boot configuration
+springBoot {
+    buildInfo {
+        properties {
+            additional.set(mapOf(
+                "spring.boot.version" to "3.2.0",
+                "java.version" to JavaVersion.VERSION_21.toString()
+            ))
+        }
+    }
 }
