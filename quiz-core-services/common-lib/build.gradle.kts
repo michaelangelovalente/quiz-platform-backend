@@ -4,33 +4,32 @@ plugins {
     id("maven-publish")
 }
 
+description = "Common library sharing DTOs, entities, exceptions, and utility code."
+
 dependencies {
     // Core Spring Framework (no Boot starter for library)
-    api("org.springframework:spring-context")
-    api("org.springframework:spring-core")
+    api(libs.spring.context)
+    api(libs.spring.core)
     
     // Validation API
-    api("jakarta.validation:jakarta.validation-api")
-    implementation("org.hibernate.validator:hibernate-validator")
+    api(libs.jakarta.validation.api)
+    implementation(libs.hibernate.validator)
     
     // JSON processing
-    api("com.fasterxml.jackson.core:jackson-core")
-    api("com.fasterxml.jackson.core:jackson-databind")
-    api("com.fasterxml.jackson.core:jackson-annotations")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    api(libs.bundles.jackson)
     
     // Utilities
-    api("org.apache.commons:commons-lang3")
-    api("org.apache.commons:commons-collections4:4.4")
-    
-    // Date/Time
-    api("org.springframework:spring-context")
+    api(libs.bundles.common.utils)
     
     // Testing
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.mockito:mockito-core")
-    testImplementation("org.assertj:assertj-core")
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.bundles.testing.basic)
+
+    // Exclude the embedded web server (Tomcat) from the common library.
+    // The final microservice applications will provide their own.
+    configurations.getByName("api") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
+    }
 }
 
 // This is a library, not an application

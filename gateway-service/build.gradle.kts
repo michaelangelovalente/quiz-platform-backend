@@ -1,47 +1,17 @@
 
-
 plugins {
     id("spring-boot-conventions")
     id("aop-conventions")
 }
 
+description = "API Gateway service with routing and cross-cutting concerns"
+
 dependencies {
-    // Spring Cloud Gateway
-    implementation("org.springframework.cloud:spring-cloud-starter-gateway")
-    implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
-
-    // Security
-//    implementation("org.springframework.boot:spring-boot-starter-security")
-
-    // Redis for caching and session (reactive)
-//    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
-
-    // Validation
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-
+    // Gateway-specific dependencies
+    implementation(libs.bundles.spring.gateway)
+    
     // Testing
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
+    testImplementation(libs.spring.cloud.starter.contract.stub.runner)
 }
 
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.0")
-    }
-}
-
-// Gateway-specific configuration
-tasks.test {
-    systemProperty("spring.profiles.active", "test")
-}
-
-// Enable bootJar (disable regular jar)
-tasks.bootJar {
-    enabled = true
-    archiveClassifier.set("")
-}
-
-tasks.jar {
-    enabled = false
-}
+// Gateway-specific configuration - test config and bootJar config handled by conventions

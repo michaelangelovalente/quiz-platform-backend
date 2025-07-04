@@ -1,0 +1,107 @@
+[versions]
+java = "21"
+kotlin = "1.9.20"
+spring-boot = "3.2.0"
+spring-cloud = "2023.0.0"
+spring-dependency-management = "1.1.4"
+aspectj = "1.9.20.1"
+lombok = "1.18.30"
+mapstruct = "1.5.5.Final"
+junit = "5.10.1"
+testcontainers = "1.19.3"
+micrometer = "1.12.0"
+docker-plugin = "9.4.0"
+springdoc = "2.2.0"
+commons-lang3 = "3.13.0"
+commons-collections4 = "4.4"
+assertj = "3.24.2"
+h2 = "2.2.224"
+postgresql = "42.7.1"
+
+[libraries]
+# Build plugins (for buildSrc)
+spring-boot-gradle-plugin = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
+spring-dependency-management-plugin = { module = "io.spring.gradle:dependency-management-plugin", version.ref = "spring-dependency-management" }
+docker-gradle-plugin = { module = "com.bmuschko:gradle-docker-plugin", version.ref = "docker-plugin" }
+
+# Spring Boot Starters
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-aop = { module = "org.springframework.boot:spring-boot-starter-aop" }
+spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache" }
+spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter-devtools = { module = "org.springframework.boot:spring-boot-starter-devtools" }
+spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
+spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
+
+# Spring Cloud
+spring-cloud-starter-gateway = { module = "org.springframework.cloud:spring-cloud-starter-gateway" }
+spring-cloud-starter-circuitbreaker-reactor-resilience4j = { module = "org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j" }
+spring-cloud-starter-contract-stub-runner = { module = "org.springframework.cloud:spring-cloud-starter-contract-stub-runner" }
+
+# Spring Framework (for libraries)
+spring-context = { module = "org.springframework:spring-context" }
+spring-core = { module = "org.springframework:spring-core" }
+
+# AspectJ
+aspectjweaver = { module = "org.aspectj:aspectjweaver", version.ref = "aspectj" }
+aspectjrt = { module = "org.aspectj:aspectjrt", version.ref = "aspectj" }
+
+# Development Tools
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+
+# Database
+h2 = { module = "com.h2database:h2", version.ref = "h2" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+
+# Validation
+jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api" }
+hibernate-validator = { module = "org.hibernate.validator:hibernate-validator" }
+
+# JSON processing
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
+jackson-module-parameter-names = { module = "com.fasterxml.jackson.module:jackson-module-parameter-names" }
+jackson-datatype-jdk8 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8" }
+
+# Utilities
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
+commons-collections4 = { module = "org.apache.commons:commons-collections4", version.ref = "commons-collections4" }
+
+# Documentation
+springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+
+# Testing
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+mockito-core = { module = "org.mockito:mockito-core" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+
+# BOM imports
+spring-cloud-bom = { module = "org.springframework.cloud:spring-cloud-dependencies", version.ref = "spring-cloud" }
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
+
+[bundles]
+spring-web = ["spring-boot-starter-web", "spring-boot-starter-validation", "spring-boot-starter-actuator"]
+spring-data = ["spring-boot-starter-data-jpa", "spring-boot-starter-cache"]
+spring-gateway = ["spring-cloud-starter-gateway", "spring-cloud-starter-circuitbreaker-reactor-resilience4j"]
+jackson = ["jackson-core", "jackson-databind", "jackson-annotations", "jackson-datatype-jsr310"]
+testing = ["spring-boot-starter-test", "junit-jupiter", "testcontainers", "testcontainers-junit-jupiter"]
+testing-basic = ["junit-jupiter", "mockito-core", "assertj-core"]
+common-utils = ["commons-lang3", "commons-collections4"]
+aspectj = ["aspectjweaver", "aspectjrt"]
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+docker = { id = "com.bmuschko.docker-java-application", version.ref = "docker-plugin" }

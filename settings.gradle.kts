@@ -1,16 +1,15 @@
 rootProject.name = "quiz-platform-backend"
 
-// Enable modern Gradle features
+// Enabl Gradle features
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 
-// Core services
 include(
     "gateway-service",
-    "quiz-service",
-    "session-service", 
-    "results-service",
-    "common-lib"
+    "quiz-core-services:common-lib",
+    "quiz-core-services:quiz-service",
+//    "session-service",
+//    "results-service",
 )
 
 // Configure build cache for faster builds
