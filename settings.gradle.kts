@@ -3,8 +3,6 @@ rootProject.name = "quiz-platform-backend"
 // Enable modern Gradle features
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-// Include buildSrc for shared build logic
-includeBuild("buildSrc")
 
 // Core services
 include(

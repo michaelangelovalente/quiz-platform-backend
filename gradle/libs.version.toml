@@ -56,4 +56,4 @@ testing = ["spring-boot-starter-test", "junit-jupiter", "testcontainers", "testc
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
-spring-dependency-management = { id = "io.spring.dependency-management" }
+spring-dependency-management = { id = "io.spring.dependency-management", version = "1.1.4" }

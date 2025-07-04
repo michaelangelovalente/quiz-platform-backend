@@ -1,4 +1,4 @@
-plugins{
+plugins {
     `kotlin-dsl`
 }
 
@@ -8,6 +8,7 @@ repositories {
 }
 
 dependencies {
+    // Plugin dependencies for buildSrc
     implementation("org.springframework.boot:spring-boot-gradle-plugin:3.2.0")
     implementation("io.spring.gradle:dependency-management-plugin:1.1.4")
     implementation("com.bmuschko:gradle-docker-plugin:9.4.0")
