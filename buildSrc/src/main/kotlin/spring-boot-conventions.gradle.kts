@@ -9,13 +9,11 @@ dependencies {
     // Prometheus metrics
     implementation("io.micrometer:micrometer-registry-prometheus")
 
-    // Development tools
-    developmentOnly("org.springframework.boot:spring-boot-starter-devtools")
+    // Development tools (commented out due to version issues - can be re-enabled later)
+    // developmentOnly("org.springframework.boot:spring-boot-starter-devtools")
 
     // Configuration processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
-springBoot {
-    buildInfo()
-}
+// buildInfo() is already configured in java-service-conventions

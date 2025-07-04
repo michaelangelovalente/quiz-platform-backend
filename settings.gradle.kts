@@ -6,8 +6,11 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 // Core services
 include(
-    "gateway-service"
-    // TODO: other modules will go here
+    "gateway-service",
+    "quiz-service",
+    "session-service", 
+    "results-service",
+    "common-lib"
 )
 
 // Configure build cache for faster builds
