@@ -2,8 +2,8 @@
 tasks.withType<Test> {
     useJUnitPlatform()
     
-    // Enable preview features JAVA
-    jvmArgs("--enable-preview")
+    // Preview features disabled - Java 21 is stable
+    // jvmArgs("--enable-preview")
     
     // Test logging configuration
     testLogging {
