@@ -7,7 +7,7 @@ description = "Quiz management service with JPA persistence"
 
 dependencies {
     // Internal dependencies
-    implementation(project(":quiz-core-services:common-lib"))
+    implementation(project(":quiz-modules:quiz-core-services:common-lib"))
     
     // Spring Boot Starters
     implementation(libs.bundles.spring.web)

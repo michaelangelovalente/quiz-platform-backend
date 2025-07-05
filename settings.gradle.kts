@@ -5,11 +5,11 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 
 include(
-    "gateway-service",
-    "quiz-core-services:common-lib",
-    "quiz-core-services:quiz-service",
-//    "session-service",
-//    "results-service",
+    "quiz-modules:gateway-service",
+    "quiz-modules:quiz-core-services:common-lib",
+    "quiz-modules:quiz-core-services:quiz-service",
+//    "quiz-modules:session-service",
+//    "quiz-modules:results-service",
 )
 
 // Configure build cache for faster builds

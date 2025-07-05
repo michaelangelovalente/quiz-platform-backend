@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "questions")
-@RequiredArgsConstructor
 //@EqualsAndHashCode
 @Getter
 @Setter

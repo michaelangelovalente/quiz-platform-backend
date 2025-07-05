@@ -48,3 +48,17 @@
     ├── 📂 helm/
     └── 📂 terraform/
 ```
+
+```markdown
+      quiz-platform-backend/
+      ├── quiz-modules/                     # All service modules
+      │   ├── gateway-service/             # API Gateway
+      │   └── quiz-core-services/          # Core quiz functionality
+      │       ├── common-lib/              # Shared utilities
+      │       └── quiz-service/            # Quiz business logic
+      └── system/                          # System-level configurations
+          ├── config/                      # Configuration files
+          ├── infrastructure/              # Future infrastructure (docker, k8s, terraform)
+          ├── scripts/                     # Build and deployment scripts
+          └── tools/                       # Development tools
+```
