@@ -8,7 +8,6 @@ plugins {
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
-        // vendor.set(JvmVendorSpec.ADOPTIUM) // Allow any vendor for flexibility
     }
     
     withSourcesJar()
@@ -54,7 +53,6 @@ tasks.withType<JavaCompile> {
 }
 
 // Test configuration is provided by test-conventions plugin
-
 tasks.named<Jar>("jar") {
     enabled = false
 }

@@ -12,11 +12,11 @@ dependencyManagement {
 
 dependencies {
     // Actuator for health checks and metrics
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation(libs.spring.boot.starter.actuator)
 
     // Development tools
-     developmentOnly("org.springframework.boot:spring-boot-starter-devtools")
+    developmentOnly(libs.spring.boot.starter.devtools)
 
     // Configuration processor
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    annotationProcessor(libs.spring.boot.configuration.processor)
 }
