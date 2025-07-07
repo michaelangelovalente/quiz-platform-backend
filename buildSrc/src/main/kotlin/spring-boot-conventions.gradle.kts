@@ -3,20 +3,13 @@ plugins {
     id("boot-jar-conventions")
 }
 
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.0")
-        mavenBom("org.testcontainers:testcontainers-bom:1.19.3")
-    }
-}
-
 dependencies {
     // Actuator for health checks and metrics
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    // Development tools
-     developmentOnly("org.springframework.boot:spring-boot-starter-devtools")
-
     // Configuration processor
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    
+    // Note: DevTools should be added per-project when needed as developmentOnly
+    // developmentOnly("org.springframework.boot:spring-boot-starter-devtools")
 }

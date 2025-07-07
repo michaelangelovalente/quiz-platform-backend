@@ -5,10 +5,17 @@ plugins {
     id("test-conventions")
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:3.2.0")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.0")
+        mavenBom("org.testcontainers:testcontainers-bom:1.19.3")
+    }
+}
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
-        // vendor.set(JvmVendorSpec.ADOPTIUM) // Allow any vendor for flexibility
     }
     
     withSourcesJar()
@@ -54,7 +61,6 @@ tasks.withType<JavaCompile> {
 }
 
 // Test configuration is provided by test-conventions plugin
-
 tasks.named<Jar>("jar") {
     enabled = false
 }
