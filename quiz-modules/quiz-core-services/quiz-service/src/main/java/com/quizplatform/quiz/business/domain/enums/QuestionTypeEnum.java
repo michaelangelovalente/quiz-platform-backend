@@ -4,5 +4,5 @@ public enum QuestionTypeEnum {
     MULTIPLE_CHOICE,
     TRUE_FALSE,
     TEXT,
-    CODE
+    CODING
 }
