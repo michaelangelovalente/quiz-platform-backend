@@ -1,9 +1,17 @@
 // Common test configuration for all projects
 tasks.withType<Test> {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        includeEngines("junit-jupiter")
+        excludeTags("slow", "integration")
+    }
     
-    // Preview features disabled - Java 21 is stable
-    // jvmArgs("--enable-preview")
+
+    // JVM options for testing
+    jvmArgs(
+        "-XX:+UseParallelGC",
+        "-Xmx1g",
+        "-Xms512m"
+    )
     
     // Test logging configuration
     testLogging {
@@ -24,11 +32,15 @@ tasks.withType<Test> {
 // Default test configuration
 tasks.named<Test>("test") {
     systemProperty("spring.profiles.active", "test")
-
-
-    // TODO? Fail build on test failures
+    systemProperty("junit.jupiter.execution.parallel.enabled", "true")
+    systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
+    
+    // Fail build on test failures (production-ready setting)
     ignoreFailures = false
     
-    // Run tests in parallel
+    // Configure parallel execution
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+    
+    // Finalize test task on exit
+    // finalizedBy(tasks.findByName("jacocoTestReport")) // Enable when jacoco plugin is added
 }

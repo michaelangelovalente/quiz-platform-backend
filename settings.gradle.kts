@@ -1,7 +1,7 @@
 rootProject.name = "quiz-platform-backend"
 
-// Enabl Gradle features
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+// Enable Gradle features (Type-safe project accessors are stable in Gradle 8.1+)
+// enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS") // No longer needed
 
 
 include(

@@ -1,4 +1,3 @@
-
 plugins {
     base
 }
@@ -9,11 +8,18 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven { url = uri("https://repo.spring.io/milestone") }
+        maven {
+            name = "SpringMilestones"
+            url = uri("https://repo.spring.io/milestone")
+            mavenContent {
+                // Only look for Spring artifacts in Spring repository
+                includeGroupByRegex("""org\.springframework.*""")
+            }
+        }
     }
 }
 
-// Root level tasks
+// Root level tasks for multi-project coordination
 tasks.register("cleanAll") {
     dependsOn(subprojects.mapNotNull { it.tasks.findByName("clean") })
     description = "Clean all subprojects"
@@ -57,4 +63,23 @@ tasks.register("startAllServices") {
     dependsOn(serviceProjects.mapNotNull { it.tasks.findByName("bootRun") })
     description = "Start all microservices"
     group = "application"
+}
+
+// Performance optimization for multi-project builds
+subprojects {
+    tasks.withType<JavaCompile>().configureEach {
+        options.isIncremental = true
+        options.isFork = true
+        options.forkOptions.jvmArgs?.addAll(listOf(
+            "-Xmx2g",
+            "-XX:+UseParallelGC"
+        ))
+    }
+    
+    tasks.withType<Test>().configureEach {
+        useJUnitPlatform()
+        maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+        systemProperty("junit.jupiter.execution.parallel.enabled", "true")
+        systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
+    }
 }

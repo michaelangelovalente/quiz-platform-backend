@@ -12,18 +12,19 @@ dependencies {
     // Spring Boot Starters
     implementation(libs.bundles.spring.web)
     implementation(libs.bundles.spring.data)
-    
+
+    // Documentation
+    implementation(libs.springdoc.openapi.starter.webmvc.ui)
+
+    // JSON processing (additional modules)
+    implementation(libs.jackson.module.parameter.names)
+    implementation(libs.jackson.datatype.jdk8)
+
     // Database
     runtimeOnly(libs.postgresql)
     runtimeOnly(libs.h2) // For testing
     
-    // Documentation
-    implementation(libs.springdoc.openapi.starter.webmvc.ui)
-    
-    // JSON processing (additional modules)
-    implementation(libs.jackson.module.parameter.names)
-    implementation(libs.jackson.datatype.jdk8)
-    
+
     // Testing
     testImplementation(libs.spring.boot.testcontainers)
     testImplementation(libs.bundles.testing)
@@ -45,13 +46,7 @@ tasks.jar {
     enabled = false
 }
 
-// Integration testing
-configurations {
-    create("integrationTestImplementation") {
-        extendsFrom(configurations.testImplementation.get())
-    }
-}
-
+// Integration testing with proper source set creation
 sourceSets {
     create("integrationTest") {
         java.srcDir("src/integrationTest/java")
@@ -59,6 +54,14 @@ sourceSets {
         compileClasspath += sourceSets.main.get().output + configurations.testRuntimeClasspath.get()
         runtimeClasspath += output + compileClasspath
     }
+}
+
+// Configure integration test dependencies using stable API
+configurations.named("integrationTestImplementation") {
+    extendsFrom(configurations.getByName("testImplementation"))
+}
+configurations.named("integrationTestRuntimeOnly") {
+    extendsFrom(configurations.getByName("testRuntimeOnly"))
 }
 
 tasks.register<Test>("integrationTest") {

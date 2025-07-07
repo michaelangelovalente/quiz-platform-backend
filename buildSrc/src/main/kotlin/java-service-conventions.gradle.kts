@@ -6,17 +6,18 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+        // vendor.set(JvmVendorSpec.ADOPTIUM) // Allow any vendor for flexibility
+    }
+    
     withSourcesJar()
     withJavadocJar()
 }
 
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
-    }
+// Use stable configuration API instead of incubating configurations block
+configurations.named("compileOnly") {
+    extendsFrom(configurations.getByName("annotationProcessor"))
 }
 
 dependencies {
@@ -35,8 +36,20 @@ dependencies {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+    options.release.set(21)
     options.compilerArgs.addAll(listOf(
-        "-parameters"
+        "-parameters",
+        "-Xlint:deprecation",
+        "-Xlint:unchecked",
+        "-Xlint:preview"
+    ))
+    
+    // Performance optimizations
+    options.isIncremental = true
+    options.isFork = true
+    options.forkOptions.jvmArgs?.addAll(listOf(
+        "-Xmx2g",
+        "-XX:+UseParallelGC"
     ))
 }
 
@@ -50,9 +63,9 @@ tasks.named<Jar>("jar") {
 springBoot {
     buildInfo {
         properties {
-            additional.set(mapOf(
+            additional.putAll(mapOf(
                 "spring.boot.version" to "3.2.0",
-                "java.version" to JavaVersion.VERSION_21.toString()
+                "java.version" to "21"
             ))
         }
     }

@@ -27,7 +27,7 @@ dependencies {
 
     // Exclude the embedded web server (Tomcat) from the common library.
     // The final microservice applications will provide their own.
-    configurations.getByName("api") {
+    configurations.named("api") {
         exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
     }
 }
