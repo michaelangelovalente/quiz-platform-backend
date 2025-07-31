@@ -315,7 +315,7 @@ application-data/
 docs/generated/
 javadoc/
 api-docs/
-system/docs/other/
+system_global/docs/other/
 
 ### Development Assistant Files ###
 CLAUDE.md

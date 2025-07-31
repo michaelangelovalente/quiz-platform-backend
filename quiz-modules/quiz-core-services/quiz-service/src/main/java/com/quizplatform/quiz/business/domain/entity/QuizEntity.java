@@ -1,36 +1,26 @@
 package com.quizplatform.quiz.business.domain.entity;
 
+import com.quizplatform.common.business.domain.entity.BasePublicEntity;
+import com.quizplatform.common.system.utils.CommonUtils;
 import com.quizplatform.quiz.business.domain.enums.QuizDifficultyEnum;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "quizzes")
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class QuizEntity {
-
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @UuidGenerator
-    // Tells Persistence layer to expect UUID (TODO: now handled by DB. Eval if better to handle App layer ?)
-    @Column(name = "public_id", updatable = false, nullable = false, unique = true)
-    private UUID publicId;
+public class QuizEntity extends BasePublicEntity<Long> {
 
     @Column(nullable = false, unique = true)
     private String title;
@@ -42,8 +32,7 @@ public class QuizEntity {
     @Column(nullable = false)
     private QuizDifficultyEnum difficulty;
 
-    //    @Column(columnDefinition = "TEXT")
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
 
@@ -73,7 +62,7 @@ public class QuizEntity {
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
     // Relationship helper methods
@@ -87,10 +76,10 @@ public class QuizEntity {
         question.setQuiz(null);
     }
 
-    // Overrided the generated setter for questions to maintain encapsulation
+    // Overrided  generated setter for questions to maintain encapsulation
     public void setQuestions(List<QuestionEntity> questions) {
         this.questions.clear();
-        if (questions != null) {
+        if (CommonUtils.nonEmptyNorNull(questions)) {
             questions.forEach(this::addQuestion);
         }
     }

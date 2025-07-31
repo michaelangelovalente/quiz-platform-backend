@@ -18,10 +18,34 @@ spring:
     activate:
       on-profile: dev
       
+  datasource:
+    url: jdbc:postgresql://localhost:5432/quiz_core_platform_db
+    username: user
+    password: mysecretpassword
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 2
+      
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        default_schema: quiz_content_service
+    open-in-view: false
+      
 logging:
   level:
     com.quizplatform: DEBUG
     org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
@@ -33,3 +57,37 @@ management:
   endpoint:
     health:
       show-details: always
+
+# Test profile
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+      
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+    
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+    open-in-view: false
+    
+  h2:
+    console:
+      enabled: true
+      
+logging:
+  level:
+    com.quizplatform: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

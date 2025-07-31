@@ -10,6 +10,8 @@ dependencies {
     // Core Spring Framework (no Boot starter for library)
     api(libs.spring.context)
     api(libs.spring.core)
+    api(libs.bundles.spring.data)
+    api(libs.bundles.spring.web)
     
     // Validation API
     api(libs.jakarta.validation.api)
@@ -25,11 +27,6 @@ dependencies {
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.bundles.testing.basic)
 
-    // Exclude the embedded web server (Tomcat) from the common library.
-    // The final microservice applications will provide their own.
-    configurations.named("api") {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
-    }
 }
 
 // This is a library, not an application
