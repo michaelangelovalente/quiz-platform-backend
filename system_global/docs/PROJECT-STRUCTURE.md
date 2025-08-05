@@ -6,9 +6,10 @@ This document provides comprehensive guidance on the project structure, architec
 
 - [Project Overview](#project-overview)
 - [Project Structure](#project-structure)
-- [Clean Architecture Implementation](#clean-architecture-implementation)
+- [Architecture Analysis](#architecture-analysis)
+- [Current Implementation](#current-implementation)
+- [Domain-Driven Design Implementation](#domain-driven-design-implementation)
 - [Modern Java 21 Best Practices](#modern-java-21-best-practices)
-- [Domain-Driven Design Patterns](#domain-driven-design-patterns)
 - [Microservices Organization](#microservices-organization)
 - [Development Workflow](#development-workflow)
 - [Testing Strategy](#testing-strategy)
@@ -16,17 +17,18 @@ This document provides comprehensive guidance on the project structure, architec
 
 ## 🎯 Project Overview
 
-**Quiz Platform Backend** is an educational quiz platform with real-time code execution capabilities built following modern software engineering principles.
-
+**Quiz Platform Backend** is an educational quiz platform built following **Domain-Driven Design (DDD)** principles with modern Java 21 features and Spring Boot 3.2.0.
 
 ### Key Characteristics
 
 | Aspect | Details                                       |
 |--------|-----------------------------------------------|
-| **Architecture** | Microservices with Clean Architecture         |
-| **Primary Languages** | Java 21 (LTS) and Go 1.24+                    |
-| **Development Phase** | -                                             |
+| **Architecture** | **Domain-Driven Design** with microservices pattern |
+| **Primary Languages** | Java 21 (LTS), Go 1.24+ (future)                    |
+| **Development Phase** | Core quiz management implemented, session management planned |
 | **Build System** | Multi-module Gradle with buildSrc conventions |
+| **Current Status** | ✅ Quiz Service operational, Gateway configured |
+| **Database** | PostgreSQL (dev), H2 (test) with JPA/Hibernate |
 
 ## 📁 Project Structure
 
@@ -47,7 +49,7 @@ quiz-platform-backend/
 │   └── quiz-core-services/         # Core business services
 │       ├── common-lib/             # Shared utilities and DTOs
 │       └── quiz-service/           # Quiz management (Port 8081)
-└── system/                         # 🔧 System-level organization
+└── system_global/                  # 🔧 System-level organization
     ├── config/                     # Configuration files
     │   └── gradle.properties       # Gradle configuration copy
     ├── docs/                       # 📚 Project documentation
@@ -104,152 +106,191 @@ quiz-service/
                 └── QuizServiceTest.java
 ```
 
-## 🏗️ Clean Architecture Implementation
+## 🏗️ Architecture Analysis
 
-### Architecture Layers (Inside-Out)
+### Current Architecture: Domain-Driven Design (DDD)
 
-The project implements Clean Architecture with four distinct layers:
+The project **follows Domain-Driven Design principles** rather than strict Clean Architecture. Here's the actual implementation:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Adapter Layer                        │ ← Controllers, REST endpoints, DTOs
-│  ┌───────────────────────────────────────────────────┐  │
-│  │              Infrastructure Layer                 │  │ ← Framework implementations, DB, messaging
-│  │  ┌─────────────────────────────────────────────┐  │  │
-│  │  │            Application Layer                │  │  │ ← Use cases, orchestrates domain logic
-│  │  │  ┌───────────────────────────────────────┐  │  │  │
-│  │  │  │           Domain Layer               │  │  │  │ ← Pure business logic, no dependencies
-│  │  │  │                                     │  │  │  │
-│  │  │  │  • Entities                        │  │  │  │
-│  │  │  │  • Value Objects                   │  │  │  │
-│  │  │  │  • Domain Services                 │  │  │  │
-│  │  │  │  • Business Rules                  │  │  │  │
-│  │  │  └───────────────────────────────────────┘  │  │  │
-│  │  └─────────────────────────────────────────────┘  │  │
-│  └───────────────────────────────────────────────────┐  │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    PRESENTATION LAYER                       │
+│                 (Controllers & DTOs)                        │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │                APPLICATION LAYER                      │  │
+│  │              (Services & Use Cases)                   │  │
+│  │  ┌─────────────────────────────────────────────────┐  │  │
+│  │  │                DOMAIN LAYER                     │  │  │
+│  │  │           (Entities & Business Logic)           │  │  │
+│  │  │                                                 │  │  │
+│  │  │  • QuizEntity (Aggregate Root)                 │  │  │
+│  │  │  • QuestionEntity                              │  │  │
+│  │  │  • Value Objects (Enums)                       │  │  │
+│  │  │  • Business Rules & Validation                 │  │  │
+│  │  │  • Repository Interfaces                       │  │  │
+│  │  └─────────────────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                             │
+│                INFRASTRUCTURE LAYER                         │
+│              (JPA, Database, Configuration)                 │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-#### 1. Domain Layer (Innermost) 💎
+#### 1. Domain Layer (Core Business Logic) 💎
 
 **Location**: `src/main/java/com/quizplatform/quiz/business/domain/`
 
-**Purpose**: Pure business logic with no framework dependencies
+**Purpose**: Rich domain model with business behavior and rules
 
-**Components**:
-- **Entities**: Core business objects (`QuizEntity`, `QuestionEntity`)
-- **Value Objects**: Immutable data structures (`QuizMetadata`)
-- **Enums**: Domain-specific enumerations (`QuestionTypeEnum`)
-- **Domain Services**: Complex business logic that doesn't belong to a single entity
+**Current Implementation**:
+- **Aggregate Root**: `QuizEntity` with embedded business logic
+- **Entity**: `QuestionEntity` as part of Quiz aggregate
+- **Value Objects**: `QuizDifficultyEnum`, `QuestionTypeEnum`
+- **Repository Interfaces**: Domain-driven repository contracts
 
-**Best Practices**:
+**Current Implementation Example**:
 ```java
-// ✅ GOOD: Pure domain entity with business logic
+// ✅ ACTUAL: Rich domain entity with business behavior
 @Entity
-public class QuizEntity {
-    // Business method in domain layer
-    public void publish() {
-        if (status != QuizStatus.DRAFT) {
-            throw new InvalidQuizStateException("Only draft quizzes can be published");
+@Table(name = "quizzes")
+public class QuizEntity extends BasePublicEntity<Long> {
+    
+    @Column(nullable = false, unique = true)
+    private String title;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private QuizDifficultyEnum difficulty;
+    
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QuestionEntity> questions = new ArrayList<>();
+    
+    // Business logic: Relationship management
+    public void addQuestion(QuestionEntity question) {
+        this.questions.add(question);
+        question.setQuiz(this);
+    }
+    
+    // Business logic: Encapsulated collection management
+    public void setQuestions(List<QuestionEntity> questions) {
+        this.questions.clear();
+        if (CommonUtils.nonEmptyNorNull(questions)) {
+            questions.forEach(this::addQuestion);
         }
-        if (questions.isEmpty()) {
-            throw new InvalidQuizStateException("Cannot publish quiz without questions");
-        }
-        this.status = QuizStatus.PUBLISHED;
-        registerEvent(new QuizPublishedEvent(id, Instant.now()));
     }
 }
 
-// ✅ GOOD: Value object with validation
-@Embeddable
-public record QuizMetadata(
-    String title,
-    String description,
-    Duration timeLimit,
-    Integer passingScore,
-    Instant createdAt,
-    String createdBy
-) {
-    public QuizMetadata {
-        Objects.requireNonNull(title, "Title is required");
-        if (timeLimit.toMinutes() < 1 || timeLimit.toMinutes() > 180) {
-            throw new IllegalArgumentException("Time limit must be between 1 and 180 minutes");
-        }
-    }
+// ✅ ACTUAL: Value objects as enums
+public enum QuizDifficultyEnum {
+    EASY, MEDIUM, HARD
+}
+
+public enum QuestionTypeEnum {
+    SINGLE_CHOICE, MULTIPLE_CHOICE, TRUE_FALSE, TEXT_INPUT, CODE_CHALLENGE
 }
 ```
 
-#### 2. Application Layer (Use Cases) 🔧
+#### 2. Application Layer (Services) 🔧
 
 **Location**: `src/main/java/com/quizplatform/quiz/business/service/`
 
-**Purpose**: Orchestrates domain logic and coordinates with infrastructure
+**Purpose**: Application services that orchestrate business operations
 
-**Components**:
-- **Service Classes**: Use case implementations (`QuizService`)
-- **Command/Query Objects**: Request/response models
-- **Event Handlers**: Domain event processing
+**Current Implementation**:
+- **QuizService**: Extends `AbstractBasePublicService` with custom business logic
+- **Transaction Management**: Proper `@Transactional` boundaries
+- **Repository Orchestration**: Coordinates with JPA repositories
 
-**Best Practices**:
+**Current Implementation Example**:
 ```java
-// ✅ GOOD: Application service orchestrating domain logic
+// ✅ ACTUAL: Service with proper transaction management
 @Service
-@Transactional
-public class QuizService {
-    private final QuizRepository quizRepository;
-    private final QuizEventPublisher eventPublisher;
-
-    public Quiz createQuiz(CreateQuizCommand command) {
-        var quiz = Quiz.builder()
-            .title(command.title())
-            .description(command.description())
-            .build();
-            
-        var savedQuiz = quizRepository.save(quiz);
-        eventPublisher.publish(new QuizCreatedEvent(savedQuiz.getId()));
-        
-        return savedQuiz;
+@RequiredArgsConstructor
+@Slf4j
+public class QuizService extends AbstractBasePublicService<QuizEntity, Long> {
+    
+    @Getter 
+    private final QuizRepository repository;
+    
+    // Custom business operation with eager loading
+    @Override
+    @Transactional(readOnly = true)
+    public Page<QuizEntity> findAll(Pageable pageable) {
+        List<QuizEntity> allQuizzes = repository.findAllWithQuestions();
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), allQuizzes.size());
+        List<QuizEntity> pageContent = allQuizzes.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, allQuizzes.size());
+    }
+    
+    // Proper transaction boundary for business operations
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<QuizEntity> findByPublicId(UUID publicId) {
+        log.debug("Finding quiz by public ID: {}", publicId);
+        return repository.findByPublicId(publicId);
     }
 }
 ```
 
 #### 3. Infrastructure Layer 🏗️
 
-**Location**: Framework-specific implementations (repositories, configurations)
+**Location**: JPA entities, Spring configurations, database access
 
-**Purpose**: Framework implementations, database access, external services
+**Purpose**: Framework-specific implementations and persistence
 
-**Components**:
-- **Repository Implementations**: JPA repositories
-- **Configuration Classes**: Spring configuration
-- **External Service Clients**: Third-party integrations
+**Current Implementation**:
+- **Base Classes**: Generic CRUD operations via `BasePublicRepository`
+- **JPA Repository**: `QuizRepository` with custom queries
+- **Database Configuration**: PostgreSQL (dev) and H2 (test)
+- **Transaction Support**: Spring's `@Transactional` management
 
-#### 4. Adapter Layer (Interface) 🌐
+#### 4. Presentation Layer (Controllers) 🌐
 
 **Location**: `src/main/java/com/quizplatform/quiz/business/controller/`
 
-**Purpose**: External interfaces (REST controllers, message handlers)
+**Purpose**: REST API endpoints and external communication
 
-**Components**:
-- **REST Controllers**: HTTP endpoint handlers (`QuizController`)
-- **DTOs**: Data transfer objects for external communication
-- **Exception Handlers**: Global error handling
+**Current Implementation**:
+- **QuizController**: Extends `BasePublicController` for standard CRUD operations
+- **DTOs**: Request/Response DTOs with validation
+- **Exception Handling**: Inherited from base controller framework
+- **OpenAPI Documentation**: Swagger annotations for API documentation
 
-**Best Practices**:
+**Current Implementation Example**:
 ```java
-// ✅ GOOD: Controller as thin adapter
+// ✅ ACTUAL: Controller leveraging base framework
 @RestController
 @RequestMapping("/api/v1/quizzes")
+@CrossOrigin(origins = "*") // For development
 @RequiredArgsConstructor
-public class QuizController {
-    private final QuizService quizService;
-
+@Slf4j
+@Tag(name = "Quiz Management", description = "APIs for managing quizzes")
+public class QuizController extends BasePublicController<QuizEntity, Long, QuizRequestDto, QuizResponseDto, QuizFilterDto> {
+    
+    @Getter final QuizService service;
+    @Getter final QuizMapper mapper;
+    
+    private static final String RESOURCE_NAME = "QUIZ";
+    
     @PostMapping
-    public ResponseEntity<QuizResponse> createQuiz(
-            @Valid @RequestBody QuizRequest request) {
-        var command = CreateQuizCommand.from(request);
-        var quiz = quizService.createQuiz(command);
-        return ResponseEntity.ok(QuizResponse.from(quiz));
+    @Operation(summary = "Create a new quiz")
+    public BaseResponse<QuizResponseDto> createQuiz(@Valid @RequestBody QuizRequestDto quiz) {
+        return super.create(quiz);
+    }
+    
+    @GetMapping
+    @Operation(summary = "Get all quizzes")
+    public BaseListResponse<QuizResponseDto> getAllQuizzes() {
+        log.info("Fetching all quizzes");
+        return super.findAll();
+    }
+    
+    @GetMapping("/{publicId}")
+    @Operation(summary = "Get quiz by public ID")
+    public BaseResponse<QuizResponseDto> getQuizByPublicId(@PathVariable UUID publicId) {
+        log.info("Fetching quiz with public ID: {}", publicId);
+        return super.findByPublicId(publicId);
     }
 }
 ```
@@ -335,113 +376,218 @@ public QuizStatistics analyzeQuizPerformance(String quizId) {
 }
 ```
 
-## 🎭 Domain-Driven Design Patterns
+## 🎭 Domain-Driven Design Implementation
 
-### Aggregate Root Pattern
+### Current DDD Patterns in Use
+
+The project demonstrates solid DDD foundations with these implemented patterns:
+
+### 1. Aggregate Root Pattern ✅
 
 ```java
-// ✅ Aggregate root with domain events
+// ✅ IMPLEMENTED: Quiz as Aggregate Root managing Question entities
 @Entity
 @Table(name = "quizzes")
-public class Quiz extends AggregateRoot {
-    @Id
-    private String id;
+public class QuizEntity extends BasePublicEntity<Long> {
     
-    @Embedded
-    private QuizMetadata metadata;
+    // Aggregate manages its internal entities
+    @OneToMany(
+        mappedBy = "quiz",
+        cascade = CascadeType.ALL, 
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    private List<QuestionEntity> questions = new ArrayList<>();
     
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "quiz_id")
-    private List<Question> questions = new ArrayList<>();
+    // Business invariants enforced through methods
+    public void addQuestion(QuestionEntity question) {
+        this.questions.add(question);
+        question.setQuiz(this); // Maintains bidirectional relationship
+    }
     
-    // Domain methods enforce business rules
-    public void addQuestion(Question question) {
-        if (questions.size() >= MAX_QUESTIONS_PER_QUIZ) {
-            throw new MaxQuestionsExceededException();
+    public void removeQuestion(QuestionEntity question) {
+        this.questions.remove(question);
+        question.setQuiz(null);
+    }
+    
+    // Encapsulation: Controlled access to internal state
+    public void setQuestions(List<QuestionEntity> questions) {
+        this.questions.clear();
+        if (CommonUtils.nonEmptyNorNull(questions)) {
+            questions.forEach(this::addQuestion);
         }
-        questions.add(question);
-        question.setQuiz(this);
-        registerEvent(new QuestionAddedEvent(id, question.getId()));
     }
 }
 ```
 
-### Repository Pattern
+### 2. Repository Pattern ✅
 
 ```java
-// ✅ Domain-focused repository interface
-public interface QuizRepository extends JpaRepository<Quiz, String> {
+// ✅ IMPLEMENTED: Domain-focused repository with business queries
+@Repository
+public interface QuizRepository extends BasePublicRepository<QuizEntity, Long> {
     
-    @Query("SELECT q FROM Quiz q WHERE q.status = :status")
-    Page<Quiz> findByStatus(@Param("status") QuizStatus status, Pageable pageable);
+    // Business-focused query: Find quiz with questions loaded
+    @Query("SELECT q FROM QuizEntity q LEFT JOIN FETCH q.questions WHERE q.publicId = :publicId")
+    Optional<QuizEntity> findByPublicId(@Param("publicId") UUID publicId);
     
-    @EntityGraph(attributePaths = {"questions", "questions.options"})
-    Optional<Quiz> findWithQuestionsById(String id);
+    // Eager loading for avoiding LazyInitializationException
+    @Query("SELECT DISTINCT q FROM QuizEntity q LEFT JOIN FETCH q.questions")
+    List<QuizEntity> findAllWithQuestions();
     
-    @Query("SELECT new com.quizplatform.dto.QuizSummary(q.id, q.title, q.status) " +
-           "FROM Quiz q WHERE q.createdBy = :userId")
-    List<QuizSummary> findSummariesByUser(@Param("userId") String userId);
+    // Inherits from BasePublicRepository:
+    // - findAll(), save(), delete()
+    // - findByPublicId(), deleteByPublicId()
+    // - existsByPublicId(), findAllByPublicIdIn()
 }
 ```
 
-### Domain Events
+### 3. Value Objects ✅
 
 ```java
-// ✅ Domain events for loose coupling
-public sealed interface QuizEvent extends DomainEvent {
-    String quizId();
-    Instant occurredAt();
+// ✅ IMPLEMENTED: Enums as Value Objects
+public enum QuizDifficultyEnum {
+    EASY, MEDIUM, HARD
 }
 
-public record QuizCreatedEvent(
-    String quizId, 
-    String title, 
-    String createdBy, 
-    Instant occurredAt
-) implements QuizEvent {}
+public enum QuestionTypeEnum {
+    SINGLE_CHOICE,
+    MULTIPLE_CHOICE, 
+    TRUE_FALSE,
+    TEXT_INPUT,
+    CODE_CHALLENGE
+}
 
-// Event publisher with transaction support
-@Component
+// ✅ IMPLEMENTED: Record DTOs as Value Objects
+@Builder
+public record QuizRequestDto(
+    Long id,
+    UUID publicId,
+    String title,
+    String category,
+    QuizDifficultyEnum difficulty,
+    String description,
+    Integer timeLimit,
+    Integer passingScore,
+    String status,
+    String createdBy,
+    List<QuestionRequestDto> questions,
+    OffsetDateTime createdAt,
+    OffsetDateTime updatedAt
+) implements BaseDto {}
+```
+
+### 4. Base Entity Framework ✅
+
+```java
+// ✅ IMPLEMENTED: Generic base classes for common operations
+public abstract class BaseEntity<ID> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private ID id;
+}
+
+public abstract class BasePublicEntity<ID> extends BaseEntity<ID> {
+    @Builder.Default
+    @Column(name = "public_id", unique = true, nullable = false, updatable = false)
+    private UUID publicId = UUID.randomUUID();
+}
+
+// Generic service operations
+public abstract class AbstractBasePublicService<E extends BasePublicEntity<ID>, ID>
+        extends AbstractBaseService<E, ID>
+        implements BaseService<E, ID> {
+    // Provides CRUD operations for entities with public IDs
+}
+```
+
+### 5. Domain Services ✅
+
+```java
+// ✅ IMPLEMENTED: Application services with business logic
+@Service
 @RequiredArgsConstructor
-public class QuizEventPublisher {
-    private final ApplicationEventPublisher publisher;
+@Slf4j
+public class QuizService extends AbstractBasePublicService<QuizEntity, Long> {
     
-    @Transactional(propagation = Propagation.MANDATORY)
-    public void publish(QuizEvent event) {
-        publisher.publishEvent(event);
+    @Getter 
+    private final QuizRepository repository;
+    
+    // Domain service operation: Custom business logic
+    @Override
+    @Transactional(readOnly = true)
+    public Page<QuizEntity> findAll(Pageable pageable) {
+        // Business logic: Eager loading to prevent lazy initialization
+        List<QuizEntity> allQuizzes = repository.findAllWithQuestions();
+        
+        // Pagination logic
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), allQuizzes.size());
+        List<QuizEntity> pageContent = allQuizzes.subList(start, end);
+        
+        return new PageImpl<>(pageContent, pageable, allQuizzes.size());
     }
 }
 ```
 
 ## 🔧 Microservices Organization
 
-### Current Services
+### Current Services (Implemented)
 
-| Service | Port | Responsibility | Technology Stack |
-|---------|------|----------------|------------------|
-| **Gateway Service** | 8080 | API Gateway, routing, cross-cutting concerns | Spring Cloud Gateway (reactive) |
-| **Quiz Service** | 8081 | Quiz management and administration | Spring Boot + JPA + H2 |
+| Service | Port | Status | Responsibility | Technology Stack |
+|---------|------|--------|----------------|------------------|
+| **Gateway Service** | 8080 | ✅ **ACTIVE** | API Gateway, routing, actuator endpoints | Spring Cloud Gateway (reactive) |
+| **Quiz Service** | 8081 | ✅ **ACTIVE** | Quiz CRUD, question management, business logic | Spring Boot + JPA + PostgreSQL/H2 |
+
+### Service Communication
+
+```yaml
+# Current Gateway Routing (application.yml)
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: quiz-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/quizzes/**
+```
 
 ### Future Services (Planned)
 
-| Service | Port | Responsibility | Technology Stack |
-|---------|------|----------------|------------------|
-| **Session Service** | 8082 | Real-time test session management | Spring Boot + WebSocket + Redis |
-| **Results Service** | 8083 | Analytics and reporting | Spring Boot + JPA + PostgreSQL |
-| **Code Execution Service** | 8084 | Secure code execution engine | Go 1.24+ + Docker + Kubernetes |
+| Service | Port | Responsibility                                           | Technology Stack                  |
+|---------|------|----------------------------------------------------------|-----------------------------------|
+| **Session Service** | 8082 | ( Real-time ? stdin/stout/stderr) test session management | Spring Boot                       |
+| **Results Service** | 8083 | Analytics and reporting                                  | Spring Boot + JPA + PostgreSQL    |
+| **Code Execution Service** | 8084 | Secure code execution engine                             | Go 1.24+ + Docker + Kubernetes(?) |
 
-### Service Communication Patterns
+### Current API Structure
 
 ```java
-// ✅ Event-driven communication between services
-@EventListener
-@Async
-public void handleQuizPublished(QuizPublishedEvent event) {
-    // Notify session service that quiz is available
-    sessionService.enableQuizForSessions(event.quizId());
+// ✅ IMPLEMENTED: RESTful API with base framework
+@RestController
+@RequestMapping("/api/v1/quizzes")
+public class QuizController extends BasePublicController {
     
-    // Update analytics
-    analyticsService.trackQuizPublication(event);
+    // POST /api/v1/quizzes - Create quiz
+    // GET /api/v1/quizzes - List all quizzes (with pagination)
+    // GET /api/v1/quizzes/{publicId} - Get quiz by public ID
+    // PUT /api/v1/quizzes/{publicId} - Update quiz (inherited)
+    // DELETE /api/v1/quizzes/{publicId} - Delete quiz (inherited)
+}
+
+// Standard response format
+public class BaseResponse<T> {
+    private boolean success;
+    private String message;
+    private T data;
+    private String timestamp;
+}
+
+public class BaseListResponse<T> {
+    private List<T> data;
+    private PageInfo pageInfo;
+    private long totalElements;
 }
 ```
 
@@ -604,15 +750,37 @@ The project uses buildSrc for shared build logic:
 - **[Quiz-Archi-V1.png](./Quiz-Archi-V1.png)** - Architecture diagram
 
 
+## 🚀 Current Implementation
+
+### ✅ What's Working Well
+
+1. **Rich Domain Entities**: Business logic embedded in entities
+2. **Aggregate Design**: Quiz properly manages Question entities
+3. **Repository Pattern**: Domain-focused repository interfaces
+4. **Generic Framework**: Reusable base classes reduce boilerplate
+5. **Transaction Management**: Proper `@Transactional` boundaries
+6. **API Standards**: Consistent response formats across endpoints
+7. **Modern Java**: Records for DTOs, SuperBuilder pattern
+8. **Documentation**: OpenAPI/Swagger integration
+
+### 🔄 Areas for Enhancement
+
+1. **More Value Objects**: Replace primitive obsession
+2. **Domain Events**: Add event-driven capabilities
+3. **Business Rules**: Move more logic into domain entities
+4. **Specifications**: Add query specification pattern
+5. **Factory Pattern**: Centralize complex object creation
+
+
 ## 🎯 Development Best Practices Summary
 
 ### Code Quality Principles
 
-1. **Clarity over Cleverness**: Write code that is easy to understand
-2. **Single Responsibility**: Each class/method should have one reason to change
-3. **Dependency Inversion**: Depend on abstractions, not concretions
-4. **Immutability**: Prefer immutable objects (records, final fields)
-5. **Fail Fast**: Validate inputs early and throw meaningful exceptions
+1. **Domain-First Design**: Start with business concepts, not database
+2. **Rich Domain Models**: Behavior in entities, not just data
+3. **Aggregate Boundaries**: Clear ownership and consistency rules
+4. **Ubiquitous Language**: Business terms in code and communication
+5. **Transaction Boundaries**: At service layer, not controller level
 
 ### Testing Principles
 
@@ -630,7 +798,8 @@ The project uses buildSrc for shared build logic:
 
 ---
 
-**Last Updated**: 2025-07-05  
-**Architecture Version**: Clean Architecture with DDD  
-**Java Version**: 21 
+**Last Updated**: 2025-08-05  
+**Architecture Pattern**: Domain-Driven Design (DDD)  
+**Java Version**: 21 LTS  
 **Spring Boot Version**: 3.2.0  
+**Current Status**: Core quiz management operational, session management planned  

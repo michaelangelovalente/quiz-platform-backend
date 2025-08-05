@@ -15,7 +15,7 @@ This document provides comprehensive information about all available endpoints a
 | Service | Port | Status | Database | Purpose |
 |---------|------|--------|----------|---------|
 | Gateway Service | 8080 | ✅ UP | N/A | API Gateway, Routing, Cross-cutting concerns |
-| Quiz Service | 8081 | ✅ UP | H2 (In-memory) | Quiz management and administration |
+| Quiz Service | 8081 | ✅ UP | PostgreSQL (dev) / H2 (test) | Quiz management and administration with full CRUD operations |
 
 ## 🚪 Gateway Service Endpoints
 
@@ -39,14 +39,19 @@ This document provides comprehensive information about all available endpoints a
 | `/health` | GET | Custom health check endpoint | JSON |
 | `/info` | GET | Custom service information | JSON |
 
+### Current Routing (Implemented)
+
+| Route Pattern | Target Service | Status | Description |
+|---------------|----------------|--------|--------------|
+| `/api/v1/quizzes/**` | quiz-service:8081 | ✅ **ACTIVE** | Quiz CRUD operations, question management |
+
 ### Planned Routing (Future)
 
-| Route Pattern | Target Service | Description |
-|---------------|----------------|-------------|
-| `/api/v1/quizzes/**` | quiz-service | Quiz management operations |
-| `/api/v1/sessions/**` | session-service | Real-time test sessions |
-| `/api/v1/results/**` | results-service | Analytics and reporting |
-| `/api/v1/execute/**` | code-execution-service | Code execution engine |
+| Route Pattern | Target Service | Status | Description |
+|---------------|----------------|--------|--------------|
+| `/api/v1/sessions/**` | session-service:8082 | 🔄 **PLANNED** | Real-time test sessions |
+| `/api/v1/results/**` | results-service:8083 | 🔄 **PLANNED** | Analytics and reporting |
+| `/api/v1/execute/**` | code-execution-service:8084 | 🔄 **PLANNED** | Code execution engine |
 
 ## 📝 Quiz Service Endpoints
 
@@ -63,12 +68,22 @@ This document provides comprehensive information about all available endpoints a
 | `/actuator/metrics` | GET | Available metrics list | JSON |
 | `/actuator/metrics/{metricName}` | GET | Specific metric details | JSON |
 
-### Business Endpoints
+### Quiz Management Endpoints (Current Implementation)
+
+| Endpoint | Method | Description | Request Body | Response Format |
+|----------|--------|-------------|--------------|------------------|
+| `/api/v1/quizzes` | POST | Create a new quiz | `QuizRequestDto` | `BaseResponse<QuizResponseDto>` |
+| `/api/v1/quizzes` | GET | Retrieve all quizzes (paginated) | None | `BaseListResponse<QuizResponseDto>` |
+| `/api/v1/quizzes/{publicId}` | GET | Get quiz by public UUID | None | `BaseResponse<QuizResponseDto>` |
+| `/api/v1/quizzes/{publicId}` | PUT | Update existing quiz | `QuizRequestDto` | `BaseResponse<QuizResponseDto>` |
+| `/api/v1/quizzes/{publicId}` | DELETE | Delete quiz by public UUID | None | `BaseResponse<GenericResponseDto>` |
+
+### System Endpoints
 
 | Endpoint | Method | Description | Response Format |
 |----------|--------|-------------|-----------------|
 | `/health` | GET | Custom health check endpoint | JSON |
-| `/quizzes` | GET | Retrieve all quizzes | JSON Array |
+| `/info` | GET | Custom service information | JSON |
 
 ## 🏥 Health Monitoring
 
@@ -214,9 +229,49 @@ curl http://localhost:8081/actuator/info
 }
 ```
 
-## 🧪 Testing Endpoints
+## 🧪 Testing Quiz API
 
-### Quick Health Check Commands
+### Quiz CRUD Operations
+
+```bash
+# Create a new quiz
+curl -X POST http://localhost:8081/api/v1/quizzes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Java Basics Quiz",
+    "category": "Programming",
+    "difficulty": "EASY",
+    "description": "Test your Java knowledge",
+    "timeLimit": 30,
+    "passingScore": 70,
+    "status": "DRAFT",
+    "questions": [
+      {
+        "text": "What is Java?",
+        "type": "SINGLE_CHOICE",
+        "options": ["Programming Language", "Coffee", "Island"],
+        "correctAnswer": ["Programming Language"],
+        "points": 10
+      }
+    ]
+  }'
+
+# Get all quizzes
+curl http://localhost:8081/api/v1/quizzes
+
+# Get quiz by public ID (replace with actual UUID)
+curl http://localhost:8081/api/v1/quizzes/{public-uuid}
+
+# Update quiz
+curl -X PUT http://localhost:8081/api/v1/quizzes/{public-uuid} \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Updated Quiz Title", ...}'
+
+# Delete quiz
+curl -X DELETE http://localhost:8081/api/v1/quizzes/{public-uuid}
+```
+
+### Health Check Commands
 
 ```bash
 # Check all services are running
@@ -235,6 +290,54 @@ curl -s http://localhost:8080/actuator | jq '._links | keys'
 curl -s http://localhost:8081/actuator | jq '._links | keys'
 ```
 
+### API Response Examples
+
+#### Successful Quiz Creation Response
+```json
+{
+  "success": true,
+  "message": "QUIZ created successfully",
+  "data": {
+    "id": 1,
+    "publicId": "123e4567-e89b-12d3-a456-426614174000",
+    "title": "Java Basics Quiz",
+    "category": "Programming",
+    "difficulty": "EASY",
+    "description": "Test your Java knowledge",
+    "timeLimit": 30,
+    "passingScore": 70,
+    "status": "DRAFT",
+    "questions": [...],
+    "createdAt": "2025-08-05T10:30:00Z",
+    "updatedAt": "2025-08-05T10:30:00Z"
+  },
+  "timestamp": "2025-08-05T10:30:00.123Z"
+}
+```
+
+#### Quiz List Response
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "publicId": "123e4567-e89b-12d3-a456-426614174000", 
+      "title": "Java Basics Quiz",
+      "difficulty": "EASY",
+      "status": "DRAFT"
+    }
+  ],
+  "pageInfo": {
+    "page": 0,
+    "size": 20,
+    "totalPages": 1,
+    "totalElements": 1
+  },
+  "success": true,
+  "timestamp": "2025-08-05T10:30:00.123Z"
+}
+```
+
 ### Service Discovery
 
 ```bash
@@ -246,9 +349,9 @@ curl http://localhost:8081/actuator
 curl http://localhost:8080/health
 curl http://localhost:8080/info
 
-# Quiz Service custom endpoints  
+# Quiz Service endpoints
 curl http://localhost:8081/health
-curl http://localhost:8081/quizzes
+curl http://localhost:8081/api/v1/quizzes
 ```
 
 ## 🔍 Health Component Details
@@ -281,17 +384,60 @@ curl http://localhost:8081/quizzes
 ./gradlew :quiz-modules:quiz-core-services:quiz-service:bootRun --args="--spring.profiles.active=local"
 ```
 
+## 📊 API Standards
+
+### Request/Response Patterns
+
+#### Standard Response Wrapper
+```java
+// All endpoints return BaseResponse<T> or BaseListResponse<T>
+public class BaseResponse<T> {
+    private boolean success;
+    private String message; 
+    private T data;
+    private String timestamp;
+}
+
+public class BaseListResponse<T> {
+    private List<T> data;
+    private PageInfo pageInfo;
+    private boolean success;
+    private String timestamp;
+}
+```
+
+#### Public ID Pattern
+- External APIs use **UUID public IDs** instead of internal database IDs
+- Example: `/api/v1/quizzes/{publicId}` not `/api/v1/quizzes/{id}`
+- Prevents internal ID exposure and provides stable external references
+
+#### Pagination Support
+- Built-in pagination with `BasePageableRequest`
+- Query parameters: `page`, `size`, `sort`
+- Response includes `PageInfo` with total elements and pages
+
+#### Error Handling
+- Consistent error codes and HTTP status mapping
+- Validation errors with field-specific messages
+- Global exception handling via `@ControllerAdvice`
+
 ## 📋 Status Summary
 
-- ✅ **Gateway Service**: Healthy, running on port 8080
-- ✅ **Quiz Service**: Healthy, running on port 8081 with H2 database
-- ✅ **Database**: H2 in-memory database connected and operational
-- ✅ **Disk Space**: Sufficient free space available
+- ✅ **Gateway Service**: Healthy, running on port 8080, routing configured
+- ✅ **Quiz Service**: Healthy, running on port 8081 with PostgreSQL/H2
+- ✅ **Database**: PostgreSQL (dev) / H2 (test) connected and operational
+- ✅ **API Endpoints**: Full CRUD operations for quiz management
+- ✅ **Documentation**: OpenAPI/Swagger integration
+- ✅ **Validation**: Bean validation with Jakarta annotations
+- ✅ **Transaction Management**: Proper `@Transactional` boundaries
+- ✅ **Lazy Loading Fix**: Resolved LazyInitializationException
 - ⚠️ **Service Discovery**: Not initialized (expected in development mode)
 
 ---
 
-**Last Updated**: 2025-07-05  
+**Last Updated**: 2025-08-05  
 **Services Version**: 0.0.1-SNAPSHOT  
-**Java Version**: 21  
-**Spring Boot Version**: 3.2.0
+**Java Version**: 21 LTS  
+**Spring Boot Version**: 3.2.0  
+**Database**: PostgreSQL (dev) / H2 (test)  
+**Architecture**: Domain-Driven Design (DDD)

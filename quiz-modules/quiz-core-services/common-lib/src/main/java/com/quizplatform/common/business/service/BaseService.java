@@ -2,14 +2,12 @@ package com.quizplatform.common.business.service;
 
 import com.quizplatform.common.business.domain.BaseDto;
 import com.quizplatform.common.business.domain.entity.BaseEntity;
-import com.quizplatform.common.business.domain.entity.BasePublicEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -32,8 +30,8 @@ public interface BaseService<E extends BaseEntity<ID>, ID> {
     @Transactional(readOnly = true)
     Optional<E> findById(ID id);
 
-    @Transactional(readOnly = true)
-   Optional<BasePublicEntity<ID>> findByPublicId(UUID publicId);
+//    @Transactional(readOnly = true)
+//   Optional<? extends BasePublicEntity<ID>> findByPublicId(UUID publicId);
 
 
     @Transactional(readOnly = true)
@@ -55,20 +53,20 @@ public interface BaseService<E extends BaseEntity<ID>, ID> {
     @Transactional
     void deleteById(ID id);
 
-    @Transactional
-    void deleteByPublicId(UUID id);
+//    @Transactional
+//    void deleteByPublicId(UUID id);
 
     @Transactional
     int deleteAllByIds(List<ID> ids);
 
-    @Transactional
-    int deleteAllByPublicIds(List<UUID> ids);
+//    @Transactional
+//    int deleteAllByPublicIds(List<UUID> ids);
 
     @Transactional(readOnly = true)
     boolean existsById(ID id);
 
-    @Transactional(readOnly = true)
-    boolean existsByPublicId(UUID id);
+//    @Transactional(readOnly = true)
+//    boolean existsByPublicId(UUID id);
 
     @Transactional(readOnly = true)
     long count();

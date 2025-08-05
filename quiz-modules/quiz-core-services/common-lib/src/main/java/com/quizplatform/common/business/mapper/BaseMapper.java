@@ -19,11 +19,14 @@ import java.util.UUID;
 public interface BaseMapper<E extends BaseEntity<?>, RequestDTO extends BaseDto, ResponseDTO extends BaseDto, FilterDTO extends BaseDto> {
 
     ResponseDTO entityToResponse(E entity);
+    E responseToEntity(ResponseDTO dto);
+
     E requestToEntity(RequestDTO dto);
     List<ResponseDTO> listEntityToListResponse(List<E> list);
     List<E> listRequestToListEntity(List<RequestDTO> list);
 
     void updateEntityFromRequest(RequestDTO dto, E entity);
+
 
     default UUID extractPublicId(E entity) {
         if (entity instanceof BasePublicEntity<?> publicEntity) {

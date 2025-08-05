@@ -43,6 +43,18 @@ public class QuizMapper implements BaseMapper<QuizEntity, QuizRequestDto, QuizRe
                 .build();
     }
 
+//    @Override
+//    public QuizResponseDto publicEntityToResponse(BasePublicEntity<?> entity) {
+//        var quizResp = entityToResponse((QuizEntity) entity);
+//        return quizResp.toBuilder().publicId(entity.getPublicId()).build();
+//    }
+
+
+    @Override
+    public QuizEntity responseToEntity(QuizResponseDto dto) {
+        return null;
+    }
+
     @Override
     public QuizEntity requestToEntity(QuizRequestDto dto) {
         if (Objects.isNull(dto)) {
@@ -123,6 +135,16 @@ public class QuizMapper implements BaseMapper<QuizEntity, QuizRequestDto, QuizRe
             entity.setCreatedBy(dto.createdBy());
         }
     }
+
+//    @Override
+//    public List<QuizResponseDto> listPublicEntityToResponseList(List<BasePublicEntity<?>> list) {
+//        return List.of();
+//    }
+//
+//    @Override
+//    public List<BasePublicEntity<?>> listResponseToPublicEntityList(List<QuizResponseDto> list) {
+//        return List.of();
+//    }
 
 
     @Override

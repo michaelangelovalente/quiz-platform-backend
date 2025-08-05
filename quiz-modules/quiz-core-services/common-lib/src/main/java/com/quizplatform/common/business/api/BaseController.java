@@ -10,7 +10,6 @@ import com.quizplatform.common.business.domain.entity.BaseEntity;
 import com.quizplatform.common.business.mapper.BaseMapper;
 import com.quizplatform.common.business.service.BaseService;
 import com.quizplatform.common.system.utils.CommonUtils;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +25,7 @@ import java.util.function.Supplier;
  * @param <E>           The entity type managed by this controller.
  * @param <RequestDTO>  The DTO type for incoming requests (Query/Request).
  * @param <ResponseDTO> The DTO type for outgoing responses (Response/Status).
- * @param <FilterDTO>
+ * @param <FilterDTO>   The DTO type for filtering operations.
  * @param <ID>          The type of the entity's identifier.
  */
 @Slf4j
@@ -34,7 +33,7 @@ public abstract class BaseController<E extends BaseEntity<ID>, ID, RequestDTO ex
 
     protected abstract BaseService<E, ID> getService();
 
-protected abstract BaseMapper<E, RequestDTO, ResponseDTO, FilterDTO> getMapper();
+    protected abstract BaseMapper<E, RequestDTO, ResponseDTO, FilterDTO> getMapper();
 
 
     public BaseResponse<ResponseDTO> create(RequestDTO request) {
@@ -82,6 +81,7 @@ protected abstract BaseMapper<E, RequestDTO, ResponseDTO, FilterDTO> getMapper()
             return getMapper().pageToBaseListResponse(page);
         }, "Failed to retrieve records");
     }
+
 
     public List<ResponseDTO> findAllAsList(
             FilterDTO filter,
@@ -156,14 +156,14 @@ protected abstract BaseMapper<E, RequestDTO, ResponseDTO, FilterDTO> getMapper()
 
     public BaseResponse<GenericResponseDto> count(FilterDTO filter) {
         return executeWithErrorHandling(() ->
-            BaseResponse.count(getService().countWithFilter(filter))
-        , String.format("Failed to count %s", getResourceName()));
+                        BaseResponse.count(getService().countWithFilter(filter))
+                , String.format("Failed to count %s", getResourceName()));
     }
 
     public BaseResponse<GenericResponseDto> countAll() {
         return executeWithErrorHandling(() ->
-            BaseResponse.count(getService().count())
-        , String.format("Failed to count all %s", getResourceName()));
+                        BaseResponse.count(getService().count())
+                , String.format("Failed to count all %s", getResourceName()));
     }
 
 
@@ -210,17 +210,14 @@ protected abstract BaseMapper<E, RequestDTO, ResponseDTO, FilterDTO> getMapper()
     /**
      * Execute with consistent error handling
      */
-    private <T> T executeWithErrorHandling(
+    protected  <T> T executeWithErrorHandling(
             Supplier<T> operation,
             String errorMessage) {
         try {
             return operation.get();
-        } catch (EntityNotFoundException e) {
-            log.error("Entity not found: {}", e.getMessage());
-            throw e;
         } catch (Exception e) {
-            log.error("{}: {}", errorMessage, e.getMessage(), e);
-            throw new RuntimeException(errorMessage + ": " + e.getMessage(), e);
+            log.error(String.format("%s: %s", errorMessage, e.getMessage()), e);
+            throw new RuntimeException(String.format("%s: %s", errorMessage, e.getMessage()), e);
         }
     }
 

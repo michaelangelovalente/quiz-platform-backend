@@ -26,8 +26,12 @@ public class QuestionMapper implements BaseMapper<QuestionEntity, QuestionReques
                 .type(entity.getType())
                 .options(entity.getOptions())
                 .points(entity.getPoints())
-
                 .build();
+    }
+
+    @Override
+    public QuestionEntity responseToEntity(QuestionResponseDto dto) {
+        return null;
     }
 
     @Override
@@ -91,4 +95,5 @@ public class QuestionMapper implements BaseMapper<QuestionEntity, QuestionReques
             entity.setExplanation(dto.explanation());
         }
     }
+
 }
