@@ -10,7 +10,7 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-@Order(1) // Higher priority than base
+@Order(1)
 public class QuizResponseAdvice extends BaseControllerResponseAdvice {
 
     @Override

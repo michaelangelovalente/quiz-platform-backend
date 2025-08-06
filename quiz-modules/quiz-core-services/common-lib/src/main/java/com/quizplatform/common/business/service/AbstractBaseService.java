@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -41,9 +42,6 @@ public abstract class AbstractBaseService<E extends BaseEntity<ID>, ID>
         return getRepository().findById(id);
     }
 
-
-
-
     @Override
     public Page<E> findAll(Pageable pageable) {
         return getRepository().findAll(pageable);
@@ -74,6 +72,7 @@ public abstract class AbstractBaseService<E extends BaseEntity<ID>, ID>
         return findById(id)
                 .map(entity -> {
                     updateFunction.accept(entity);
+//                   entity.setUpdatedAt(OffsetDateTime.now());
                     return save(entity);
                 })
                 .orElseThrow(() -> new EntityNotFoundException(

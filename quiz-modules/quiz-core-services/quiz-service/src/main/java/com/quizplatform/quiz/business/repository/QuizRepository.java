@@ -12,9 +12,11 @@ import java.util.UUID;
 
 @Repository
 public interface QuizRepository extends BasePublicRepository<QuizEntity, Long> {
+    
     @Query("SELECT q FROM QuizEntity q LEFT JOIN FETCH q.questions WHERE q.publicId = :publicId")
     Optional<QuizEntity> findByPublicId(@Param("publicId") UUID publicId);
     
     @Query("SELECT DISTINCT q FROM QuizEntity q LEFT JOIN FETCH q.questions")
     List<QuizEntity> findAllWithQuestions();
+    
 }

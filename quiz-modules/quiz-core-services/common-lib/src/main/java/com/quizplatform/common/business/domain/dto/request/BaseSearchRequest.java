@@ -43,10 +43,6 @@ public record BaseSearchRequest(
     }
 
     public BaseSearchRequest {
-//        if (page < 0) page = 0;
-//        if (size < 1) size = 20;
-//        if (size > 100) size = 100;
-
         sort = Objects.requireNonNullElse(sort, List.of());
         filters = Objects.requireNonNullElse(filters, Map.of());
 

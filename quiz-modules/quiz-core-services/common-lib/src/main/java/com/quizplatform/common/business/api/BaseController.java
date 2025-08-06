@@ -37,6 +37,7 @@ public abstract class BaseController<E extends BaseEntity<ID>, ID, RequestDTO ex
 
 
     public BaseResponse<ResponseDTO> create(RequestDTO request) {
+        log.info("Creating new {} with data: {}", getResourceName(), request);
         try {
             E entity = getMapper().requestToEntity(request);
             E saved = getService().save(entity);
@@ -48,7 +49,7 @@ public abstract class BaseController<E extends BaseEntity<ID>, ID, RequestDTO ex
 
     public BaseListResponse<ResponseDTO> saveAll(
             List<RequestDTO> dtos) {
-
+        log.info("Batch creating {} with data: {}", getResourceName(), dtos);
         return executeWithErrorHandling(() -> {
             List<E> entities = getMapper().listRequestToListEntity(dtos);
             List<E> saved = getService().saveAll(entities);
@@ -105,6 +106,7 @@ public abstract class BaseController<E extends BaseEntity<ID>, ID, RequestDTO ex
     }
 
     public BaseListResponse<ResponseDTO> findAll() {
+        log.info("Retrieving all records of {}", getResourceName());
         return executeWithErrorHandling(() -> {
             BasePageableRequest defaultPageable = BasePageableRequest.defaultRequest();
             Pageable pageable = createPageable(defaultPageable);

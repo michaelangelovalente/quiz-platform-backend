@@ -30,10 +30,6 @@ public interface BaseService<E extends BaseEntity<ID>, ID> {
     @Transactional(readOnly = true)
     Optional<E> findById(ID id);
 
-//    @Transactional(readOnly = true)
-//   Optional<? extends BasePublicEntity<ID>> findByPublicId(UUID publicId);
-
-
     @Transactional(readOnly = true)
     Page<E> findAll(Pageable pageable);
 
@@ -47,26 +43,14 @@ public interface BaseService<E extends BaseEntity<ID>, ID> {
     @Transactional
     E update(ID id, Consumer<E> updateFunction);
 
-//    @Transactional
-//    E update(UUID publicId, Consumer<E> updateFunction);
-
     @Transactional
     void deleteById(ID id);
-
-//    @Transactional
-//    void deleteByPublicId(UUID id);
 
     @Transactional
     int deleteAllByIds(List<ID> ids);
 
-//    @Transactional
-//    int deleteAllByPublicIds(List<UUID> ids);
-
     @Transactional(readOnly = true)
     boolean existsById(ID id);
-
-//    @Transactional(readOnly = true)
-//    boolean existsByPublicId(UUID id);
 
     @Transactional(readOnly = true)
     long count();
