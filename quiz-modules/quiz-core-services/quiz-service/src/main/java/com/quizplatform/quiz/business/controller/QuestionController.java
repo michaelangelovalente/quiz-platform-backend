@@ -60,11 +60,11 @@ public class QuestionController extends BaseController<QuestionEntity, Long, Que
         return super.findAll(new QuestionFilterDto(), pageRequest);
     }
 
-    @GetMapping("/all")
-    @Operation(summary = "Get all questions (no pagination)", description = "Retrieve all questions without pagination")
-    public BaseListResponse<QuestionResponseDto> getAllQuestions() {
-        return super.findAll();
-    }
+//    @GetMapping("/all")
+//    @Operation(summary = "Get all questions (no pagination)", description = "Retrieve all questions without pagination")
+//    public BaseListResponse<QuestionResponseDto> getAllQuestions() {
+//        return super.findAll();
+//    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get question by ID", description = "Retrieve a question by its internal ID")
@@ -73,21 +73,21 @@ public class QuestionController extends BaseController<QuestionEntity, Long, Que
         return super.findById(id);
     }
 
-    @GetMapping("/{id}/review")
-    @Operation(summary = "Get question with answers for review", description = "Retrieve a question with correct answers for review purposes")
-    public BaseResponse<QuestionReviewResponseDto> getQuestionForReview(
-            @Parameter(description = "Internal ID of the question") @PathVariable Long id) {
-        log.info("Retrieving question with ID {} for review", id);
-        try {
-            QuestionEntity question = service.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
-            QuestionReviewResponseDto response = mapper.entityToReviewResponse(question);
-            return BaseResponse.success(response);
-        } catch (Exception e) {
-            log.error("Failed to retrieve question with ID {} for review", id, e);
-            return BaseResponse.error("REVIEW_ERROR", e.getMessage());
-        }
-    }
+//    @GetMapping("/{id}/review")
+//    @Operation(summary = "Get question with answers for review", description = "Retrieve a question with correct answers for review purposes")
+//    public BaseResponse<QuestionReviewResponseDto> getQuestionForReview(
+//            @Parameter(description = "Internal ID of the question") @PathVariable Long id) {
+//        log.info("Retrieving question with ID {} for review", id);
+//        try {
+//            QuestionEntity question = service.findById(id)
+//                    .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
+//            QuestionReviewResponseDto response = mapper.entityToReviewResponse(question);
+//            return BaseResponse.success(response);
+//        } catch (Exception e) {
+//            log.error("Failed to retrieve question with ID {} for review", id, e);
+//            return BaseResponse.error("REVIEW_ERROR", e.getMessage());
+//        }
+//    }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a question", description = "Update question data")

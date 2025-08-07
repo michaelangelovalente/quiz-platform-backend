@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,11 +32,10 @@ class QuestionServiceTest {
     private QuestionService questionService;
 
     private QuestionEntity sampleQuestion;
-    private QuizEntity sampleQuiz;
 
     @BeforeEach
     void setUp() {
-        sampleQuiz = QuizEntity.builder()
+        QuizEntity sampleQuiz = QuizEntity.builder()
                 .id(1L)
                 .title("Java Basics")
                 .build();
@@ -45,7 +45,7 @@ class QuestionServiceTest {
                 .text("What is Java?")
                 .type(QuestionTypeEnum.MULTIPLE_CHOICE)
                 .options(Arrays.asList("Programming Language", "Coffee", "Island"))
-                .correctAnswer(Arrays.asList("Programming Language"))
+                .correctAnswer(List.of("Programming Language"))
                 .points(10)
                 .explanation("Java is a programming language")
                 .quiz(sampleQuiz)
@@ -86,7 +86,7 @@ class QuestionServiceTest {
     @DisplayName("Should find questions by quiz ID")
     void findByQuizId_ShouldReturnQuestions_WhenQuestionsExist() {
         // Given
-        List<QuestionEntity> expectedQuestions = Arrays.asList(sampleQuestion);
+        List<QuestionEntity> expectedQuestions = Collections.singletonList(sampleQuestion);
         when(questionRepository.findByQuizId(1L)).thenReturn(expectedQuestions);
 
         // When
@@ -94,7 +94,7 @@ class QuestionServiceTest {
 
         // Then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getText()).isEqualTo("What is Java?");
+        assertThat(result.getFirst().getText()).isEqualTo("What is Java?");
         verify(questionRepository).findByQuizId(1L);
     }
 
@@ -178,7 +178,7 @@ class QuestionServiceTest {
     @DisplayName("Should find questions by minimum points")
     void findByMinimumPoints_ShouldReturnQuestionsAboveThreshold() {
         // Given
-        List<QuestionEntity> expectedQuestions = Arrays.asList(sampleQuestion);
+        List<QuestionEntity> expectedQuestions = Collections.singletonList(sampleQuestion);
         when(questionRepository.findByMinimumPoints(5)).thenReturn(expectedQuestions);
 
         // When
@@ -186,7 +186,7 @@ class QuestionServiceTest {
 
         // Then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getPoints()).isGreaterThanOrEqualTo(5);
+        assertThat(result.getFirst().getPoints()).isGreaterThanOrEqualTo(5);
         verify(questionRepository).findByMinimumPoints(5);
     }
 }
