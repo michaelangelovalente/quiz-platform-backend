@@ -19,6 +19,7 @@ import java.util.UUID;
  */
 @MappedSuperclass
 @Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)

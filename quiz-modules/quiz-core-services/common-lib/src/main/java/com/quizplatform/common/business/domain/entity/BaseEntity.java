@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
 @Getter
+@Setter
 @SuperBuilder // Enables builder pattern for inheritance
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA requirement
 @AllArgsConstructor(access = AccessLevel.PROTECTED)

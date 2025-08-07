@@ -92,7 +92,8 @@ public class QuizController extends BasePublicController<QuizEntity, Long, QuizR
     @PatchMapping("/{publicId}/archive")
     @Operation(summary = "Archive a quiz", description = "Change quiz status to ARCHIVED")
     public BaseResponse<QuizResponseDto> archiveQuiz(
-            @Parameter(description = "Public ID of the quiz to archive") @PathVariable UUID publicId) {
+            @Parameter(description = "Public ID of the quiz to archive") @PathVariable UUID publicId
+    ) {
         log.info("Archiving quiz with public ID: {}", publicId);
         try {
             QuizEntity archivedQuiz = service.archiveQuiz(publicId);
@@ -116,7 +117,7 @@ public class QuizController extends BasePublicController<QuizEntity, Long, QuizR
      * Checks if a quiz exists by its public ID
      *
      * @param publicId the public ID to check
-     * @return true if quiz exists, false otherwise
+     * returns true if quiz exists, false otherwise
      */
     @GetMapping("/exists/{publicId}")
     @Operation(summary = "Check if quiz exists", description = "Check if a quiz exists by its public ID")
