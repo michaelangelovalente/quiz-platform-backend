@@ -1,4 +1,4 @@
-// server specific configuration
+// Package server is specific for server configuration
 package server
 
 import (
