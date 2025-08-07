@@ -170,7 +170,7 @@ class QuestionControllerTest {
         mockMvc.perform(get("/api/v1/questions/quiz/{quizId}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpected(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data[0].text").value("What is Java?"));
     }
 
@@ -200,7 +200,7 @@ class QuestionControllerTest {
         mockMvc.perform(delete("/api/v1/questions/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpected(jsonPath("$.message").value("QUESTION deleted successfully"));
+                .andExpect(jsonPath("$.message").value("QUESTION deleted successfully"));
     }
 
     @Test
@@ -213,7 +213,7 @@ class QuestionControllerTest {
         mockMvc.perform(delete("/api/v1/questions/{id}", 999L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpected(jsonPath("$.message").value("QUESTION with id: 999 not found"));
+                .andExpect(jsonPath("$.message").value("QUESTION with id: 999 not found"));
     }
 
     @Test
@@ -239,7 +239,7 @@ class QuestionControllerTest {
         mockMvc.perform(get("/api/v1/questions/count"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpected(jsonPath("$.data.count").value(10));
+                .andExpect(jsonPath("$.data.count").value(10));
     }
 
     @Test
@@ -260,7 +260,7 @@ class QuestionControllerTest {
                         .content(objectMapper.writeValueAsString(requestList)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpected(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data[0].text").value("What is Java?"));
     }
 }
