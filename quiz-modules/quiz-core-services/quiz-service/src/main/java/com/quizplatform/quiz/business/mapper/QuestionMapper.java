@@ -5,6 +5,7 @@ import com.quizplatform.common.system.utils.CommonUtils;
 import com.quizplatform.quiz.business.domain.dto.filter.QuestionFilterDto;
 import com.quizplatform.quiz.business.domain.dto.request.QuestionRequestDto;
 import com.quizplatform.quiz.business.domain.dto.response.QuestionResponseDto;
+import com.quizplatform.quiz.business.domain.dto.response.QuestionReviewResponseDto;
 import com.quizplatform.quiz.business.domain.entity.QuestionEntity;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,33 @@ public class QuestionMapper implements BaseMapper<QuestionEntity, QuestionReques
                 .options(entity.getOptions())
                 .points(entity.getPoints())
                 .build();
+    }
+
+    public QuestionReviewResponseDto entityToReviewResponse(QuestionEntity entity) {
+        if (Objects.isNull(entity)) {
+            return null;
+        }
+
+        return QuestionReviewResponseDto.builder()
+                .id(entity.getId())
+                .text(entity.getText())
+                .type(entity.getType())
+                .options(entity.getOptions())
+                .correctAnswer(entity.getCorrectAnswer())
+                .points(entity.getPoints())
+                .explanation(entity.getExplanation())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
+    }
+
+    public List<QuestionReviewResponseDto> listEntityToListReviewResponse(List<QuestionEntity> list) {
+        if (CommonUtils.isEmptyOrNull(list)) {
+            return List.of();
+        }
+        return list.stream()
+                .map(this::entityToReviewResponse)
+                .toList();
     }
 
     @Override
