@@ -1,34 +1,39 @@
 package app
 
 import (
+	"code-execution-service/internal/api"
+	"code-execution-service/migrations"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"code-execution-service/internal/database"
+	"code-execution-service/internal/store"
 )
 
 type Application struct {
 	Logger *log.Logger
-	DB     database.Service
+	DB     store.Service
 	// Handlers....
 	// Middleware     middleware.UserMiddleware
 }
 
 func NewApplication() (*Application, error) {
-	db := database.New()
+	db := store.New()
 
 	// run migraiton from base of directory
-	// err = store.MigrateFS(pgDB, migrations.FS, ".")
-	// if err != nil {
-	// 	panic(err) // DB not working --> app shouldn't work
-	// }
+	err := store.MigrateFS(db.GetDB(), migrations.FS, ".")
+	if err != nil {
+		panic(err) // DB not working --> app shouldn't work
+	}
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
 	// ---- Store layer ------------
+	executionStore := store.NewPostgresExecutionStore(db.GetDB())
 	// -------------------------------------
+
 	// ----- Handler layer  ----------
+	executionHandler := api.NewExecutionHandler(executionStore, logger)
 	// middlewareHandler := middleware.UserMiddleware{UserStore: userStore}
 	// -------------------------------------
 

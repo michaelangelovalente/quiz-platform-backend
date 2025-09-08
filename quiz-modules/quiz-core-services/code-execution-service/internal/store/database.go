@@ -1,9 +1,11 @@
-package database
+package store
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/pressly/goose/v3"
+	"io/fs"
 	"log"
 	"os"
 	"strconv"
@@ -13,19 +15,22 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-// Service represents a service that interacts with a database.
+// Service represents a DBService that interacts with a database.
 type Service interface {
 	// Health returns a map of health status information.
-	// The keys and values in the map are service-specific.
+	// The keys and values in the map are DBService-specific.
 	Health() map[string]string
 
 	// Close terminates the database connection.
 	// It returns an error if the connection cannot be closed.
 	Close() error
+
+	// GetDB returns the underlying *sql.DB for advanced operations like migrations.
+	GetDB() *sql.DB
 }
 
-type service struct {
-	db *sql.DB
+type DBService struct {
+	DB *sql.DB
 }
 
 var (
@@ -35,7 +40,7 @@ var (
 	port       = os.Getenv("DB_PORT")
 	host       = os.Getenv("DB_HOST")
 	schema     = os.Getenv("DB_SCHEMA")
-	dbInstance *service
+	dbInstance *DBService
 )
 
 func New() Service {
@@ -50,26 +55,26 @@ func New() Service {
 		panic(err)
 	}
 
-	dbInstance = &service{
-		db: db,
+	dbInstance = &DBService{
+		DB: db,
 	}
 	return dbInstance
 }
 
 // Health checks the health of the database connection by pinging the database.
 // It returns a map with keys indicating various health statistics.
-func (s *service) Health() map[string]string {
+func (s *DBService) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	stats := make(map[string]string)
 
 	// Ping the database
-	err := s.db.PingContext(ctx)
+	err := s.DB.PingContext(ctx)
 	if err != nil {
 		stats["status"] = "down"
-		stats["error"] = fmt.Sprintf("db down: %v", err)
-		log.Fatalf("db down: %v", err) // Log the error and terminate the program
+		stats["error"] = fmt.Sprintf("DB down: %v", err)
+		log.Fatalf("DB down: %v", err) // Log the error and terminate the program
 		return stats
 	}
 
@@ -78,7 +83,7 @@ func (s *service) Health() map[string]string {
 	stats["message"] = "It's healthy"
 
 	// Get database stats (like open connections, in use, idle, etc.)
-	dbStats := s.db.Stats()
+	dbStats := s.DB.Stats()
 	stats["open_connections"] = strconv.Itoa(dbStats.OpenConnections)
 	stats["in_use"] = strconv.Itoa(dbStats.InUse)
 	stats["idle"] = strconv.Itoa(dbStats.Idle)
@@ -111,7 +116,58 @@ func (s *service) Health() map[string]string {
 // It logs a message indicating the disconnection from the specific database.
 // If the connection is successfully closed, it returns nil.
 // If an error occurs while closing the connection, it returns the error.
-func (s *service) Close() error {
+func (s *DBService) Close() error {
 	log.Printf("Disconnected from database: %s", database)
-	return s.db.Close()
+	return s.DB.Close()
+}
+
+// GetDB returns the underlying *sql.DB for advanced operations like migrations.
+func (s *DBService) GetDB() *sql.DB {
+	return s.DB
+}
+
+// ----  GOOSE MIGRATION UTILITIES  ----
+// Provides both CLI and programmatic migrations  (Functions are for programmatic goose usage, might be removed for security issues)
+
+// MigrateFS runs database migrations from embedded filesystem.
+// Use this for bundling migration files in the application binary.
+func MigrateFS(db *sql.DB, migrationFS fs.FS, dir string) error {
+	goose.SetBaseFS(migrationFS)
+	defer func() {
+		goose.SetBaseFS(nil)
+	}()
+	return Migrate(db, dir)
+}
+
+// Migrate runs all pending migrations in the specified directory.
+// Sets PostgreSQL dialect and executes goose.Up().
+func Migrate(db *sql.DB, dir string) error {
+	err := goose.SetDialect("postgres")
+	if err != nil {
+		return fmt.Errorf("failed to set goose dialect: %w", err)
+	}
+
+	err = goose.Up(db, dir)
+	if err != nil {
+		return fmt.Errorf("failed to execute migrations: %w", err)
+	}
+
+	return nil
+}
+
+// MigrationStatus checks if migrations are needed without running them.
+// Returns true if migrations are pending, false if up-to-date.
+func MigrationStatus(db *sql.DB, dir string) (bool, error) {
+	err := goose.SetDialect("postgres")
+	if err != nil {
+		return false, fmt.Errorf("failed to set dialect: %w", err)
+	}
+
+	currentVersion, err := goose.GetDBVersion(db)
+	if err != nil {
+		return false, fmt.Errorf("failed to get database version: %w", err)
+	}
+
+	// Version 0 means no migrations applied yet
+	return currentVersion == 0, nil
 }

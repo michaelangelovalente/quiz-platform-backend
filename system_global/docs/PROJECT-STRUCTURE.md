@@ -750,19 +750,6 @@ The project uses buildSrc for shared build logic:
 - **[Quiz-Archi-V1.png](./Quiz-Archi-V1.png)** - Architecture diagram
 
 
-## 🚀 Current Implementation
-
-### ✅ What's Working Well
-
-1. **Rich Domain Entities**: Business logic embedded in entities
-2. **Aggregate Design**: Quiz properly manages Question entities
-3. **Repository Pattern**: Domain-focused repository interfaces
-4. **Generic Framework**: Reusable base classes reduce boilerplate
-5. **Transaction Management**: Proper `@Transactional` boundaries
-6. **API Standards**: Consistent response formats across endpoints
-7. **Modern Java**: Records for DTOs, SuperBuilder pattern
-8. **Documentation**: OpenAPI/Swagger integration
-
 ### 🔄 Areas for Enhancement
 
 1. **More Value Objects**: Replace primitive obsession
@@ -770,6 +757,7 @@ The project uses buildSrc for shared build logic:
 3. **Business Rules**: Move more logic into domain entities
 4. **Specifications**: Add query specification pattern
 5. **Factory Pattern**: Centralize complex object creation
+6. **Configuration Management**:  Current project has multiple application.yaml files and inline string config (e.g api endpoints), this should be standardized to a fewer shared config files
 
 
 ## 🎯 Development Best Practices Summary

@@ -2,7 +2,9 @@
 package server
 
 import (
+	"code-execution-service/internal/routes"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -20,6 +22,11 @@ type Server struct {
 
 func NewServer(application *app.Application) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	if port == 0 {
+		log.Print("environment variable for PORT was not detected, defaulting to 8087")
+		port = 8087
+	}
+
 	server := &Server{
 		port: port,
 		app:  application,
@@ -28,7 +35,7 @@ func NewServer(application *app.Application) *http.Server {
 	// HTTP Server config
 	httpServer := &http.Server{
 		Addr:         fmt.Sprintf(":%d", server.port),
-		Handler:      server.RegisterRoutes(),
+		Handler:      routes.SetupRoutes(application),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
