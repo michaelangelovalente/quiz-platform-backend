@@ -82,3 +82,31 @@ func (s *PostgresExecutionStore) SaveExecution(ctx context.Context, execution *E
 	}
 	return nil
 }
+
+//func (s *PostgresExecutionStore) UpdateExecution(ctx context.Context, execution *Execution) error {
+//	tx, err := s.DB.BeginTx(ctx, nil)
+//
+//	if err != nil {
+//		return err
+//	}
+//	defer tx.Rollback()
+//	query := `
+//	UPDATE executions
+//	SET status = $1, completed_at = $2, execution_time_ms = $3, output = $4, error_output = $5, exit_code = $6, success = $7
+//	WHERE id = $8
+//	`
+//	res, err := tx.ExecContext(ctx, query, execution.Status, execution.CompletedAt, execution.ExecutionTime, execution.Output, execution.ErrorOutput, execution.ExitCode, execution.Success, execution.ID)
+//	if err != nil {
+//		return err
+//	}
+//
+//	rowsAffected, err := res.RowsAffected()
+//	if err != nil {
+//		return err
+//	}
+//
+//	if rowsAffected == 0 {
+//		return sql.ErrNoRows
+//	}
+//
+//}

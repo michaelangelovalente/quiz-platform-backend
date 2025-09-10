@@ -1,4 +1,5 @@
 -- +goose Up
+SET SEARCH_PATH TO code_execution_service;
 -- Enable required PostgreSQL extensions
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
@@ -14,7 +15,7 @@ CREATE TYPE execution_status AS ENUM (
 CREATE TYPE programming_language AS ENUM (
     'java', 
     'typescript',
-    'go', 
+    'go'
 );
 
 -- Create executions table for tracking code execution requests
