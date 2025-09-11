@@ -1,11 +1,11 @@
 package api
 
 import (
-	"code-execution-service/internal/api/executor"
 	"code-execution-service/internal/store"
-	"context"
-	"database/sql"
+	"code-execution-service/internal/utils"
+	"encoding/json"
 	"log"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -52,69 +52,39 @@ type TestCaseResult struct {
 }
 
 type ExecutionHandler struct {
-	db       *sql.DB
-	executor *executor.DockerExecutor
-	logger   *log.Logger
+	executionStore store.ExecutionStore
+	logger         *log.Logger
 }
 
-func NewExecutionHandler(db *sql.DB, logger *log.Logger) *ExecutionHandler {
+func NewExecutionHandler(executionStore store.ExecutionStore, logger *log.Logger) *ExecutionHandler {
 	return &ExecutionHandler{
-		db:       db,
-		executor: executor.NewDockerExecutor(),
-		logger:   logger,
+		executionStore: executionStore,
+		logger:         logger,
 	}
 }
 
-func (s *ExecutionHandler) ExecuteCode(ctx context.Context, req ExecuteRequest) (*ExecuteResponse, error) {
-	// Generate execution ID
+func (eh *ExecutionHandler) Execute(w http.ResponseWriter, r *http.Request) {
+
+	var execution store.Execution
 	executionID := "exec_" + strconv.FormatInt(time.Now().UnixNano(), 10)
+	execution.ExecutionID = executionID
 
-	// Save initial execution record --> TODO: move init to store. Handler should handle parsing
-	execution := &store.Execution{
-		ExecutionID: executionID,
-		Language:    req.Language,
-		Code:        req.Code,
-		Status:      "RUNNING",
-		StartedAt:   time.Now(),
-		QuestionID:  req.QuestionID,
-		//UserID:      req.UserID,
-		SessionID: req.SessionID,
-	}
-
-	err := s.db.SaveExecution(ctx, execution)
+	err := json.NewDecoder(r.Body).Decode(&execution)
 	if err != nil {
-		return nil, err
+		eh.logger.Printf("ERROR: decoding json: %v", err)
+		utils.WriteJSON(w, http.StatusBadRequest,
+			utils.Envelope{
+				"error": "invalid request: error decoding json",
+			})
 	}
 
-	// Execute code
-	result, err := s.executor.ExecuteCode(req.Language, req.Code)
-
-	// Update execution record
-	execution.Status = "COMPLETED"
+	err = eh.executionStore.SaveExecution(&execution)
 	if err != nil {
-		execution.Status = "FAILED"
-		execution.ErrorOutput = &err.Error()
-	} else {
-		execution.Output = &result.Output
-		execution.Success = result.Success
-	}
-	execution.CompletedAt = &time.Now()
-	execution.ExecutionTime = &result.ExecutionTime
-
-	err = s.db.UpdateExecution(ctx, execution)
-	if err != nil {
-		s.logger.Printf("Failed to update execution: %v", err)
+		eh.logger.Printf("ERROR: saving execution: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError,
+			utils.Envelope{
+				"error": "internal server error: error saving execution",
+			})
 	}
 
-	// Build response
-	return &ExecuteResponse{
-		ExecutionID:   executionID,
-		Status:        execution.Status,
-		Success:       execution.Success,
-		Output:        result.Output,
-		ErrorOutput:   result.ErrorOutput,
-		ExecutionTime: result.ExecutionTime,
-		StartedAt:     execution.StartedAt,
-		CompletedAt:   execution.CompletedAt,
-	}, nil
 }

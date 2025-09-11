@@ -60,3 +60,4 @@ postgres-data/
 *.swo
 
 !/.env
+/.env

@@ -3,19 +3,16 @@ package app
 import (
 	"code-execution-service/internal/api"
 	"code-execution-service/migrations"
-	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	"code-execution-service/internal/store"
 )
 
 type Application struct {
-	Logger *log.Logger
-	DB     store.Service
-	// Handlers....
-	// Middleware     middleware.UserMiddleware
+	Logger           *log.Logger
+	DB               store.Service
+	ExecutionHandler *api.ExecutionHandler
 }
 
 func NewApplication() (*Application, error) {
@@ -38,17 +35,11 @@ func NewApplication() (*Application, error) {
 	// -------------------------------------
 
 	app := &Application{
-		Logger: logger,
-		DB:     db,
+		Logger:           logger,
+		DB:               db,
+		ExecutionHandler: executionHandler,
 		// Middleware:     middlewareHandler,
 	}
 
 	return app, nil
-}
-
-// HealthCheck function
-// handler <- HTTP HANDLER
-// method receiver on *Application
-func (app *Application) HealthCheck(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Status is available\n") // Fprint specifically used to pass data to cleint
 }
