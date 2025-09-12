@@ -21,8 +21,8 @@ type DockerExecutor struct {
 func NewDockerExecutor() *DockerExecutor {
 	return &DockerExecutor{
 		timeout:     30 * time.Second,
-		memoryLimit: "128m",
-		cpuLimit:    "0.5",
+		memoryLimit: "512m",  // Increased memory for faster compilation
+		cpuLimit:    "2.0",   // Increased CPU for faster compilation
 		tempDir:     "/tmp/code-execution",
 	}
 }
@@ -39,8 +39,8 @@ func (e *DockerExecutor) ExecuteCode(language, code string) (*ExecutionResult, e
 }
 
 func (e *DockerExecutor) executeGo(code string) (*ExecutionResult, error) {
-	return e.executeInDocker("golang:1.21-alpine", "go", code, ".go", []string{
-		"sh", "-c", "cd /app && go run code.go",
+	return e.executeInDocker("golang:1.24.5-alpine", "go", code, ".go", []string{
+		"sh", "-c", "cd /app && go build -o ./code_exec code.go && ./code_exec", //TODO: replace with go run
 	})
 }
 
@@ -75,12 +75,13 @@ func (e *DockerExecutor) executeInDocker(image, language, code, extension string
 		"run", "--rm",
 		"--memory=" + e.memoryLimit,
 		"--cpus=" + e.cpuLimit,
-		"--network=none",                         // No network access
-		"--read-only",                            // Read-only file system
-		"--tmpfs", "/tmp:noexec,nosuid,size=10m", // Limited temp space
-		"--user", "nobody", // Run as non-root user
+		"--network=none",                   // No network access
+		"--read-only",                      // Read-only file system
+		"--tmpfs", "/tmp:nosuid,size=250m", // Limited temp space
+		"--tmpfs", "/.cache:noexec,nosuid,size=100m", // Go build cache
+		"--user", "1000:1000", // Run as non-root user
 		"--workdir", "/app",
-		"-v", execDir + ":/app:ro", // Mount code as read-only
+		"-v", execDir + ":/app", // Mount code as read-write
 	}
 
 	// Add timeout and command

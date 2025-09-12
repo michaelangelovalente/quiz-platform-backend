@@ -2,6 +2,7 @@ package app
 
 import (
 	"code-execution-service/internal/api"
+	"code-execution-service/internal/api/executor"
 	"code-execution-service/migrations"
 	"log"
 	"os"
@@ -30,7 +31,8 @@ func NewApplication() (*Application, error) {
 	// -------------------------------------
 
 	// ----- Handler layer  ----------
-	executionHandler := api.NewExecutionHandler(executionStore, logger)
+	dockerExecutor := executor.NewDockerExecutor()
+	executionHandler := api.NewExecutionHandler(executionStore, dockerExecutor, logger)
 	// middlewareHandler := middleware.UserMiddleware{UserStore: userStore}
 	// -------------------------------------
 

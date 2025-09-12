@@ -1,6 +1,7 @@
 package api
 
 import (
+	"code-execution-service/internal/api/executor"
 	"code-execution-service/internal/store"
 	"code-execution-service/internal/utils"
 	"encoding/json"
@@ -52,13 +53,15 @@ type TestCaseResult struct {
 }
 
 type ExecutionHandler struct {
-	executionStore store.ExecutionStore
+	executionStore store.ExecutionStore     //
+	executor       *executor.DockerExecutor // tmp ---> pass Service layer and place store in service
 	logger         *log.Logger
 }
 
-func NewExecutionHandler(executionStore store.ExecutionStore, logger *log.Logger) *ExecutionHandler {
+func NewExecutionHandler(executionStore store.ExecutionStore, executor *executor.DockerExecutor, logger *log.Logger) *ExecutionHandler {
 	return &ExecutionHandler{
 		executionStore: executionStore,
+		executor:       executor,
 		logger:         logger,
 	}
 }
@@ -78,13 +81,29 @@ func (eh *ExecutionHandler) Execute(w http.ResponseWriter, r *http.Request) {
 			})
 	}
 
+	// pre save --> before exec saved in db.
 	err = eh.executionStore.SaveExecution(&execution)
 	if err != nil {
-		eh.logger.Printf("ERROR: saving execution: %v", err)
+		eh.logger.Printf("ERROR: saving pre execution: %v", err)
 		utils.WriteJSON(w, http.StatusInternalServerError,
 			utils.Envelope{
 				"error": "internal server error: error saving execution",
 			})
 	}
+
+	//Execute code
+	result, err := eh.executor.ExecuteCode(execution.Language, execution.Code)
+	if err != nil {
+		eh.logger.Printf("ERROR: executing code: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError,
+			utils.Envelope{
+				"error": "internal server error: error executing code",
+			})
+	}
+
+	utils.WriteJSON(w, http.StatusOK,
+		utils.Envelope{
+			"result": result,
+		})
 
 }

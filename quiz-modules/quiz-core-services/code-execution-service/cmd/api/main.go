@@ -34,6 +34,7 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 }
 
 func main() {
+
 	application, err := app.NewApplication()
 	if err != nil {
 		log.Fatal("Failed to create application:", err)
